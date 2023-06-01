@@ -54,11 +54,18 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
-          <Text style={styles.btnText}>Зареєструватися</Text>
+          <Text style={styles.btnText}>Увійти</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btnLink} activeOpacity={0.6}>
-          <Text style={styles.btnLinkText}>Вже є акаунт? Увійти</Text>
-        </TouchableOpacity>
+        <View style={styles.btnLinkWrap}>
+          <Text style={styles.btnLinkText}>Немає акаунту? </Text>
+          <TouchableOpacity style={styles.btnLink} activeOpacity={0.6}>
+            <Text
+              style={{ ...styles.btnLinkText, textDecorationLine: "underline" }}
+            >
+              Зареєструватися
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ImageBackground>
   );
@@ -113,11 +120,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   btnLink: {
-    marginLeft: "auto",
-    marginRight: "auto",
+    // marginLeft: "auto",
+    // marginRight: "auto",
   },
   btnLinkText: {
     color: "#1B4371",
     fontSize: 16,
+  },
+
+  btnLinkWrap: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
