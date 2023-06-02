@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { useState, useEffect, useRef } from "react";
-import AddIcon from "../assets/add-icon.svg";
+import AddIcon from "../images/add-icon.svg";
 
 export default function RegistrationForm() {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);

@@ -1,13 +1,13 @@
 import { StyleSheet, Image, View } from "react-native";
 
-import BG from "../assets/photo-bg.jpg";
-import RegistrationForm from "../Components/RegistrationForm";
+import BG from "../images/photo-bg.jpg";
+import LoginForm from "../Components/LoginForm";
 
-export default function RegistrationScreen() {
+export default function LoginScreen() {
   return (
     <View style={styles.wrap}>
       <Image source={BG} style={styles.bg} />
-      <RegistrationForm />
+      <LoginForm />
     </View>
   );
 }
