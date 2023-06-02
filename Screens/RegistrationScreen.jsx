@@ -1,7 +1,7 @@
 import { StyleSheet, Image, View } from "react-native";
 
 import BG from "../assets/photo-bg.jpg";
-import RegistrationForm from "./Components/RegistrationForm";
+import RegistrationForm from "../Components/RegistrationForm";
 
 export default function RegistrationScreen() {
   return (

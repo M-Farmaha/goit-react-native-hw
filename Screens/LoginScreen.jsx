@@ -1,7 +1,7 @@
 import { StyleSheet, Image, View } from "react-native";
 
 import BG from "../assets/photo-bg.jpg";
-import LoginForm from "./Components/LoginForm";
+import LoginForm from "../Components/LoginForm";
 
 export default function LoginScreen() {
   return (
