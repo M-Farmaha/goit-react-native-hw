@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   Keyboard,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useState, useEffect } from "react";
 
@@ -44,77 +45,79 @@ export default function LoginForm() {
   };
 
   return (
-    <View
-      style={{
-        ...styles.form,
-        paddingBottom: isKeyboardShown ? 32 : 150,
-      }}
-    >
-      <Text style={styles.title}>Увійти</Text>
-      <TextInput
-        style={{
-          ...styles.input,
-          marginBottom: 16,
-          borderColor: isInputEmailFocused ? "#FF6C00" : "#E8E8E8",
-        }}
-        placeholder={"Адреса електронної пошти"}
-        autoComplete={"off"}
-        autoCorrect={false}
-        selectionColor={"#FF6C00"}
-        onFocus={handleEmailFocus}
-        onBlur={handleEmailBlur}
-      />
-      <View>
+    <KeyboardAvoidingView behavior={"padding"} style={styles.container}>
+      <View style={styles.form}>
+        <Text style={styles.title}>Увійти</Text>
         <TextInput
           style={{
             ...styles.input,
-            borderColor: isInputPasswordFocused ? "#FF6C00" : "#E8E8E8",
+            marginBottom: 16,
+            borderColor: isInputEmailFocused ? "#FF6C00" : "#E8E8E8",
           }}
-          placeholder={"Пароль"}
-          secureTextEntry={true}
+          placeholder={"Адреса електронної пошти"}
           autoComplete={"off"}
           autoCorrect={false}
           selectionColor={"#FF6C00"}
-          onFocus={handlePasswordFocus}
-          onBlur={handlePasswordBlur}
+          onFocus={handleEmailFocus}
+          onBlur={handleEmailBlur}
         />
-        <TouchableOpacity
-          style={{
-            ...styles.btnLink,
-            position: "absolute",
-            right: 16,
-            top: 13,
-          }}
-          activeOpacity={0.6}
-        >
-          <Text style={styles.btnLinkText}>Показати</Text>
-        </TouchableOpacity>
-      </View>
-      {!isKeyboardShown && (
         <View>
-          <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
-            <Text style={styles.btnText}>Увійти</Text>
+          <TextInput
+            style={{
+              ...styles.input,
+              marginBottom: isKeyboardShown ? 150 : 43,
+              borderColor: isInputPasswordFocused ? "#FF6C00" : "#E8E8E8",
+            }}
+            placeholder={"Пароль"}
+            secureTextEntry={true}
+            autoComplete={"off"}
+            autoCorrect={false}
+            selectionColor={"#FF6C00"}
+            onFocus={handlePasswordFocus}
+            onBlur={handlePasswordBlur}
+          />
+          <TouchableOpacity
+            style={{
+              ...styles.btnLink,
+              position: "absolute",
+              right: 16,
+              top: 13,
+            }}
+            activeOpacity={0.6}
+          >
+            <Text style={styles.btnLinkText}>Показати</Text>
           </TouchableOpacity>
-          <View style={styles.btnLinkWrap}>
-            <Text style={styles.btnLinkText}>Немає акаунту? </Text>
-            <TouchableOpacity style={styles.btnLink} activeOpacity={0.6}>
-              <Text
-                style={{
-                  ...styles.btnLinkText,
-                  textDecorationLine: "underline",
-                }}
-              >
-                Зареєструватися
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
-      )}
-    </View>
+        {!isKeyboardShown && (
+          <View>
+            <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
+              <Text style={styles.btnText}>Увійти</Text>
+            </TouchableOpacity>
+            <View style={styles.btnLinkWrap}>
+              <Text style={styles.btnLinkText}>Немає акаунту? </Text>
+              <TouchableOpacity style={styles.btnLink} activeOpacity={0.6}>
+                <Text
+                  style={{
+                    ...styles.btnLinkText,
+                    textDecorationLine: "underline",
+                  }}
+                >
+                  Зареєструватися
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+
   form: {
     width: "100%",
     position: "absolute",
@@ -123,6 +126,7 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 16,
     paddingTop: 32,
+    paddingBottom: 144,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
@@ -149,7 +153,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF6C00",
     borderRadius: 100,
     height: 50,
-    marginTop: 43,
     marginBottom: 16,
     justifyContent: "center",
     alignItems: "center",
