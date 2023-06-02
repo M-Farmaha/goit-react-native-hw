@@ -32,7 +32,6 @@ export default function RegistrationForm() {
 
   const handleLoginFocus = () => {
     setInputLoginFocused(true);
-    setIsKeyboardShown(true);
   };
   const handleLoginBlur = () => {
     setInputLoginFocused(false);
@@ -40,7 +39,6 @@ export default function RegistrationForm() {
 
   const handleEmailFocus = () => {
     setInputEmailFocused(true);
-    setIsKeyboardShown(true);
   };
   const handleEmailBlur = () => {
     setInputEmailFocused(false);
@@ -48,7 +46,6 @@ export default function RegistrationForm() {
 
   const handlePasswordFocus = () => {
     setInputPasswordFocused(true);
-    setIsKeyboardShown(true);
   };
   const handlePasswordBlur = () => {
     setInputPasswordFocused(false);

@@ -30,7 +30,6 @@ export default function LoginForm() {
 
   const handleEmailFocus = () => {
     setInputEmailFocused(true);
-    setIsKeyboardShown(true);
   };
   const handleEmailBlur = () => {
     setInputEmailFocused(false);
@@ -38,7 +37,6 @@ export default function LoginForm() {
 
   const handlePasswordFocus = () => {
     setInputPasswordFocused(true);
-    setIsKeyboardShown(true);
   };
   const handlePasswordBlur = () => {
     setInputPasswordFocused(false);
