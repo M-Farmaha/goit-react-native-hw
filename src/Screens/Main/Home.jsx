@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import PostsScreen from "./PostsScreen";
-import CreatePostsScreen from "./CreatePostsScreen";
+import CreatePostScreen from "./CreatePostScreen";
 import ProfileScreen from "./ProfileScreen";
 import CustomTabBar from "../../../Components/CustomTabBar";
 
@@ -58,7 +58,7 @@ export default Home = ({ isLogined, setIsLogined }) => {
       />
       <Tab.Screen
         name="CreatePosts"
-        component={CreatePostsScreen}
+        component={CreatePostScreen}
         options={{
           title: "Створити публікацію",
           headerTitleAlign: "center",

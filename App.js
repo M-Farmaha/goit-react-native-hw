@@ -14,7 +14,7 @@ import LoginScreen from "./src/Screens/Auth/LoginScreen";
 import Home from "./src/Screens/Main/Home";
 
 export default App = () => {
-  const [isLogined, setIsLogined] = useState(false);
+  const [isLogined, setIsLogined] = useState(true);
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./src/fonts/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./src/fonts/Roboto-Medium.ttf"),

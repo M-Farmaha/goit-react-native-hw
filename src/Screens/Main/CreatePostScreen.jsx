@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 import AddPhotoIcon from "../../images/addphoto-icon.svg";
 import LocationIcon from "../../images/location-icon.svg";
 
-export default function CreatePostsScreen() {
+export default function CreatePostScreen() {
   const [postName, setPostName] = useState();
   const [location, setLocation] = useState();
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);

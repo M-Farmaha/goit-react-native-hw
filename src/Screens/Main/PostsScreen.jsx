@@ -7,7 +7,7 @@ export default function PostsScreen() {
     <View style={styles.main}>
       <View style={styles.profile}>
         <View style={styles.profileImage}>
-          <Image source={ProfilePhoto} />
+          <Image source={ProfilePhoto} style={styles.profilePhoto} />
         </View>
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>Maks Farmaha</Text>
@@ -43,6 +43,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     overflow: "hidden",
   },
+  profilePhoto: {
+    width: 60,
+    height: 60,
+  },
+
   profileName: {
     fontFamily: "Roboto-Bold",
     fontSize: 13,
