@@ -46,7 +46,10 @@ export default function CreatePostScreen() {
 
           <View style={styles.form}>
             <TextInput
-              style={styles.input}
+              style={{
+                ...styles.input,
+                marginBottom: 16,
+              }}
               placeholder={"Назва..."}
               autoComplete={"off"}
               autoCorrect={false}
@@ -89,9 +92,9 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     backgroundColor: "#ffffff",
-
     paddingLeft: 16,
     paddingRight: 16,
+    justifyContent: "flex-end",
   },
 
   photo: {
@@ -122,12 +125,8 @@ const styles = StyleSheet.create({
   },
 
   form: {
-    width: "100%",
-    position: "absolute",
-    bottom: 0,
-    left: 16,
     backgroundColor: "#ffffff",
-    paddingBottom: 80,
+    marginBottom: "auto",
   },
 
   input: {
@@ -137,7 +136,6 @@ const styles = StyleSheet.create({
     borderBottomColor: "#E8E8E8",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 16,
   },
 
   locationIcon: {
@@ -149,7 +147,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 100,
     height: 50,
-    marginTop: 16,
+    marginTop: 32,
     justifyContent: "center",
     alignItems: "center",
   },

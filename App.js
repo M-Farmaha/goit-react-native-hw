@@ -14,7 +14,7 @@ import LoginScreen from "./src/Screens/Auth/LoginScreen";
 import Home from "./src/Screens/Main/Home";
 
 export default App = () => {
-  const [isLogined, setIsLogined] = useState(true);
+  const [isLogined, setIsLogined] = useState(false);
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./src/fonts/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./src/fonts/Roboto-Medium.ttf"),
@@ -35,14 +35,14 @@ export default App = () => {
           {!isLogined ? (
             <AuthStack.Navigator>
               <AuthStack.Screen
-                name="Login"
-                options={{ headerShown: false }}
-                component={LoginScreen}
-              />
-              <AuthStack.Screen
                 name="Register"
                 options={{ headerShown: false }}
                 component={RegistrationScreen}
+              />
+              <AuthStack.Screen
+                name="Login"
+                options={{ headerShown: false }}
+                component={LoginScreen}
               />
             </AuthStack.Navigator>
           ) : (

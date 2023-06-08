@@ -8,7 +8,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
-  Alert,
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
@@ -43,7 +42,6 @@ export default LoginScreen = () => {
   }, []);
 
   const onLogin = () => {
-    Alert.alert("Виконано вхід з екрану LoginScreen");
     setEmail("");
     setPassword("");
     setIsLogined(true);
@@ -54,15 +52,20 @@ export default LoginScreen = () => {
       <Image source={BG} style={styles.bg} />
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView behavior={"padding"} style={styles.container}>
-          <View style={styles.form}>
+          <View
+            style={{
+              ...styles.form,
+              paddingBottom: isKeyboardShown ? 344 : 144,
+            }}
+          >
             <Text style={styles.title}>Увійти</Text>
             <TextInput
-              style={{
-                ...styles.input,
-                marginBottom: 16,
-                borderColor: isInputEmailFocused ? "#FF6C00" : "#E8E8E8",
-                backgroundColor: isInputEmailFocused ? "#ffffff" : "#F6F6F6",
-              }}
+              style={[
+                isInputEmailFocused
+                  ? styles.focusedInput
+                  : styles.unfocusedInput,
+                { marginBottom: 16 },
+              ]}
               placeholder={"Адреса електронної пошти"}
               autoComplete={"off"}
               autoCorrect={false}
@@ -74,14 +77,11 @@ export default LoginScreen = () => {
             />
             <View>
               <TextInput
-                style={{
-                  ...styles.input,
-                  marginBottom: isKeyboardShown ? 150 : 43,
-                  borderColor: isInputPasswordFocused ? "#FF6C00" : "#E8E8E8",
-                  backgroundColor: isInputPasswordFocused
-                    ? "#ffffff"
-                    : "#F6F6F6",
-                }}
+                style={[
+                  isInputPasswordFocused
+                    ? styles.focusedInput
+                    : styles.unfocusedInput,
+                ]}
                 placeholder={"Пароль"}
                 secureTextEntry={!showPassword}
                 autoComplete={"off"}
@@ -164,17 +164,30 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 16,
     paddingTop: 32,
-    paddingBottom: 144,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
-  input: {
+  unfocusedInput: {
     fontSize: 16,
     height: 50,
     paddingLeft: 16,
     paddingRight: 16,
     borderWidth: 1,
     backgroundColor: "#F6F6F6",
+    borderColor: "#E8E8E8",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  focusedInput: {
+    fontSize: 16,
+    height: 50,
+    paddingLeft: 16,
+    paddingRight: 16,
+    borderWidth: 1,
+    backgroundColor: "#ffffff",
+    borderColor: "#FF6C00",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -191,6 +204,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF6C00",
     borderRadius: 100,
     height: 50,
+    marginTop: 43,
     marginBottom: 16,
     justifyContent: "center",
     alignItems: "center",

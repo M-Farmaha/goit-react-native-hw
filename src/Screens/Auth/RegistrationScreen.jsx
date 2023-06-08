@@ -8,7 +8,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
-  Alert,
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
@@ -46,7 +45,6 @@ export default RegistrationScreen = () => {
   }, []);
 
   const onLogin = () => {
-    Alert.alert("Виконано вхід з екрану RegistrationScreen");
     setLogin("");
     setEmail("");
     setPassword("");
@@ -57,7 +55,12 @@ export default RegistrationScreen = () => {
       <Image source={BG} style={styles.bg} />
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView behavior={"padding"} style={styles.container}>
-          <View style={styles.form}>
+          <View
+            style={{
+              ...styles.form,
+              paddingBottom: isKeyboardShown ? 278 : 78,
+            }}
+          >
             <View style={styles.profileImage}>
               <TouchableOpacity style={styles.addButton} activeOpacity={0.6}>
                 <AddIcon width={13} height={13} fill={"#FF6C00"} />
@@ -65,12 +68,12 @@ export default RegistrationScreen = () => {
             </View>
             <Text style={styles.title}>Реєстрація</Text>
             <TextInput
-              style={{
-                ...styles.input,
-                marginBottom: 16,
-                borderColor: isInputLoginFocused ? "#FF6C00" : "#E8E8E8",
-                backgroundColor: isInputLoginFocused ? "#ffffff" : "#F6F6F6",
-              }}
+              style={[
+                isInputLoginFocused
+                  ? styles.focusedInput
+                  : styles.unfocusedInput,
+                { marginBottom: 16 },
+              ]}
               placeholder={"Логін"}
               autoComplete={"off"}
               autoCorrect={false}
@@ -81,12 +84,12 @@ export default RegistrationScreen = () => {
               onChangeText={(value) => setLogin(value)}
             />
             <TextInput
-              style={{
-                ...styles.input,
-                marginBottom: 16,
-                borderColor: isInputEmailFocused ? "#FF6C00" : "#E8E8E8",
-                backgroundColor: isInputEmailFocused ? "#ffffff" : "#F6F6F6",
-              }}
+              style={[
+                isInputEmailFocused
+                  ? styles.focusedInput
+                  : styles.unfocusedInput,
+                { marginBottom: 16 },
+              ]}
               placeholder={"Адреса електронної пошти"}
               autoComplete={"off"}
               autoCorrect={false}
@@ -98,14 +101,11 @@ export default RegistrationScreen = () => {
             />
             <View>
               <TextInput
-                style={{
-                  ...styles.input,
-                  marginBottom: isKeyboardShown ? 120 : 43,
-                  borderColor: isInputPasswordFocused ? "#FF6C00" : "#E8E8E8",
-                  backgroundColor: isInputPasswordFocused
-                    ? "#ffffff"
-                    : "#F6F6F6",
-                }}
+                style={[
+                  isInputPasswordFocused
+                    ? styles.focusedInput
+                    : styles.unfocusedInput,
+                ]}
                 placeholder={"Пароль"}
                 secureTextEntry={!showPassword}
                 autoComplete={"off"}
@@ -131,22 +131,24 @@ export default RegistrationScreen = () => {
                 </Text>
               </TouchableOpacity>
             </View>
-            <View>
-              <TouchableOpacity
-                style={styles.btn}
-                activeOpacity={0.6}
-                onPress={onLogin}
-              >
-                <Text style={styles.btnText}>Зареєструватися</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.btnLink}
-                activeOpacity={0.6}
-                onPress={() => navigation.navigate("Login")}
-              >
-                <Text style={styles.btnLinkText}>Вже є акаунт? Увійти</Text>
-              </TouchableOpacity>
-            </View>
+            {!isKeyboardShown && (
+              <View>
+                <TouchableOpacity
+                  style={styles.btn}
+                  activeOpacity={0.6}
+                  onPress={onLogin}
+                >
+                  <Text style={styles.btnText}>Зареєструватися</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.btnLink}
+                  activeOpacity={0.6}
+                  onPress={() => navigation.navigate("Login")}
+                >
+                  <Text style={styles.btnLinkText}>Вже є акаунт? Увійти</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -175,17 +177,30 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 16,
     paddingTop: 92,
-    paddingBottom: 78,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
-  input: {
+  unfocusedInput: {
     fontSize: 16,
     height: 50,
     paddingLeft: 16,
     paddingRight: 16,
     borderWidth: 1,
     backgroundColor: "#F6F6F6",
+    borderColor: "#E8E8E8",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  focusedInput: {
+    fontSize: 16,
+    height: 50,
+    paddingLeft: 16,
+    paddingRight: 16,
+    borderWidth: 1,
+    backgroundColor: "#ffffff",
+    borderColor: "#FF6C00",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -227,6 +242,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF6C00",
     borderRadius: 100,
     height: 50,
+    marginTop: 43,
     marginBottom: 16,
     justifyContent: "center",
     alignItems: "center",
