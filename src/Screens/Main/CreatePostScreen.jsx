@@ -20,12 +20,18 @@ export default function CreatePostScreen() {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
 
   useEffect(() => {
-    const showKB = Keyboard.addListener("keyboardDidShow", () => {
-      setIsKeyboardShown(true);
-    });
-    const hideKB = Keyboard.addListener("keyboardDidHide", () => {
-      setIsKeyboardShown(false);
-    });
+    const showKB = Keyboard.addListener(
+      Platform.OS == "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => {
+        setIsKeyboardShown(true);
+      }
+    );
+    const hideKB = Keyboard.addListener(
+      Platform.OS == "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => {
+        setIsKeyboardShown(false);
+      }
+    );
 
     return () => {
       showKB.remove();
@@ -35,16 +41,26 @@ export default function CreatePostScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <KeyboardAvoidingView behavior={"padding"} style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS == "ios" ? "padding" : "heigth"}
+        style={styles.container}
+      >
         <View style={styles.main}>
-          <View style={styles.photo}>
-            <TouchableOpacity style={styles.addPhoto} activeOpacity={0.6}>
-              <AddPhotoIcon fill={"#bdbdbd"} />
-            </TouchableOpacity>
+          <View>
+            <View style={styles.photo}>
+              <TouchableOpacity style={styles.addPhoto} activeOpacity={0.6}>
+                <AddPhotoIcon fill={"#bdbdbd"} />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.text}>Завантажте фото</Text>
           </View>
-          <Text style={styles.text}>Завантажте фото</Text>
 
-          <View style={styles.form}>
+          <View
+            style={{
+              ...styles.form,
+              paddingBottom: isKeyboardShown ? 32 : 111,
+            }}
+          >
             <TextInput
               style={{
                 ...styles.input,
@@ -73,11 +89,10 @@ export default function CreatePostScreen() {
 
               <LocationIcon style={styles.locationIcon} fill={"#bdbdbd"} />
             </View>
-            {!isKeyboardShown && (
-              <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
-                <Text style={styles.btnText}>Опублікувати</Text>
-              </TouchableOpacity>
-            )}
+
+            <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
+              <Text style={styles.btnText}>Опублікувати</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -109,6 +124,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
+
   addPhoto: {
     borderRadius: 100,
     width: 60,
@@ -126,7 +142,6 @@ const styles = StyleSheet.create({
 
   form: {
     backgroundColor: "#ffffff",
-    marginBottom: "auto",
   },
 
   input: {

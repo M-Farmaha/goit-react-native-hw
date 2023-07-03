@@ -8,6 +8,8 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
+  Alert,
+  Platform,
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
@@ -31,12 +33,18 @@ export default RegistrationScreen = () => {
   const { setIsLogined } = useUser();
 
   useEffect(() => {
-    const showKB = Keyboard.addListener("keyboardDidShow", () => {
-      setIsKeyboardShown(true);
-    });
-    const hideKB = Keyboard.addListener("keyboardDidHide", () => {
-      setIsKeyboardShown(false);
-    });
+    const showKB = Keyboard.addListener(
+      Platform.OS == "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => {
+        setIsKeyboardShown(true);
+      }
+    );
+    const hideKB = Keyboard.addListener(
+      Platform.OS == "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => {
+        setIsKeyboardShown(false);
+      }
+    );
 
     return () => {
       showKB.remove();
@@ -49,16 +57,20 @@ export default RegistrationScreen = () => {
     setEmail("");
     setPassword("");
     setIsLogined(true);
+    Alert.alert("Виконано вхід зі сторінки Registration");
   };
   return (
     <View style={styles.wrap}>
       <Image source={BG} style={styles.bg} />
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <KeyboardAvoidingView behavior={"padding"} style={styles.container}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS == "ios" ? "padding" : "heigth"}
+          style={styles.container}
+        >
           <View
             style={{
               ...styles.form,
-              paddingBottom: isKeyboardShown ? 278 : 78,
+              paddingBottom: isKeyboardShown ? 32 : 78,
             }}
           >
             <View style={styles.profileImage}>
@@ -131,7 +143,7 @@ export default RegistrationScreen = () => {
                 </Text>
               </TouchableOpacity>
             </View>
-            {!isKeyboardShown && (
+            {isKeyboardShown ? null : (
               <View>
                 <TouchableOpacity
                   style={styles.btn}
@@ -168,11 +180,10 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+    justifyContent: "flex-end",
   },
+
   form: {
-    width: "100%",
-    position: "absolute",
-    bottom: 0,
     backgroundColor: "#ffffff",
     paddingLeft: 16,
     paddingRight: 16,
@@ -180,6 +191,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
+
   unfocusedInput: {
     fontSize: 16,
     height: 50,
