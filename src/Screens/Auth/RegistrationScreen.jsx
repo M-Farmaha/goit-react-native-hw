@@ -1,7 +1,6 @@
 import {
   StyleSheet,
   TextInput,
-  Image,
   View,
   Text,
   TouchableOpacity,
@@ -16,8 +15,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from "react";
 import { useUser } from "../../../userContext";
 
+import BackGroundImage from "../../Components/BackGroundImage";
 import AddIcon from "../../images/add-icon.svg";
-import BG from "../../images/photo-bg.jpg";
 
 export default RegistrationScreen = () => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
@@ -60,11 +59,11 @@ export default RegistrationScreen = () => {
     Alert.alert("Виконано вхід зі сторінки Registration");
   };
   return (
-    <View style={styles.wrap}>
-      <Image source={BG} style={styles.bg} />
+    <>
+      <BackGroundImage />
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView
-          behavior={Platform.OS == "ios" ? "padding" : "heigth"}
+          behavior={Platform.OS == "ios" ? "padding" : null}
           style={styles.container}
         >
           <View
@@ -164,20 +163,11 @@ export default RegistrationScreen = () => {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-    </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  wrap: {
-    flex: 1,
-  },
-  bg: {
-    position: "absolute",
-    top: 0,
-    width: "100%",
-  },
-
   container: {
     flex: 1,
     justifyContent: "flex-end",

@@ -1,5 +1,5 @@
 import { StyleSheet, View, TouchableOpacity } from "react-native";
-import DeleteIcon from "../src/images/delete-icon.svg";
+import DeleteIcon from "../images/delete-icon.svg";
 
 export default CustomTabBar = ({ state, descriptors, navigation }) => {
   let modifiedRoutes = state.routes;

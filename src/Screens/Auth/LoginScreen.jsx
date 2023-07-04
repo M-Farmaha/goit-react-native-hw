@@ -16,7 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from "react";
 import { useUser } from "../../../userContext";
 
-import BG from "../../images/photo-bg.jpg";
+import BackGroundImage from "../../Components/BackGroundImage";
 
 export default LoginScreen = () => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
@@ -57,11 +57,11 @@ export default LoginScreen = () => {
   };
 
   return (
-    <View style={styles.wrap}>
-      <Image source={BG} style={styles.bg} />
+    <>
+      <BackGroundImage />
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView
-          behavior={Platform.OS == "ios" ? "padding" : "heigth"}
+          behavior={Platform.OS == "ios" ? "padding" : null}
           style={styles.container}
         >
           <View
@@ -150,18 +150,13 @@ export default LoginScreen = () => {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-    </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   wrap: {
     flex: 1,
-  },
-  bg: {
-    position: "absolute",
-    top: 0,
-    width: "100%",
   },
 
   container: {

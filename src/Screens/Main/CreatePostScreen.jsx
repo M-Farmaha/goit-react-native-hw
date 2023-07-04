@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
+  Platform,
 } from "react-native";
 import { useState, useEffect } from "react";
 
@@ -40,81 +41,76 @@ export default function CreatePostScreen() {
   }, []);
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS == "ios" ? "padding" : "heigth"}
-        style={styles.container}
-      >
-        <View style={styles.main}>
-          <View>
-            <View style={styles.photo}>
-              <TouchableOpacity style={styles.addPhoto} activeOpacity={0.6}>
-                <AddPhotoIcon fill={"#bdbdbd"} />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.text}>Завантажте фото</Text>
-          </View>
-
-          <View
-            style={{
-              ...styles.form,
-              paddingBottom: isKeyboardShown ? 32 : 111,
-            }}
-          >
-            <TextInput
-              style={{
-                ...styles.input,
-                marginBottom: 16,
-              }}
-              placeholder={"Назва..."}
-              autoComplete={"off"}
-              autoCorrect={false}
-              selectionColor={"#bdbdbd"}
-              value={postName}
-              onChangeText={(value) => setPostName(value)}
-            />
-            <View>
-              <TextInput
-                style={{
-                  ...styles.input,
-                  paddingLeft: 25,
-                }}
-                placeholder={"Місцевість..."}
-                autoComplete={"off"}
-                autoCorrect={false}
-                selectionColor={"#bdbdbd"}
-                value={location}
-                onChangeText={(value) => setLocation(value)}
-              />
-
-              <LocationIcon style={styles.locationIcon} fill={"#bdbdbd"} />
-            </View>
-
-            <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
-              <Text style={styles.btnText}>Опублікувати</Text>
-            </TouchableOpacity>
-          </View>
+    <View
+      style={{
+        ...styles.main,
+        justifyContent: isKeyboardShown ? "flex-end" : "flex-start",
+      }}
+    >
+      <View>
+        <View style={styles.photo}>
+          <TouchableOpacity style={styles.addPhoto} activeOpacity={0.6}>
+            <AddPhotoIcon fill={"#bdbdbd"} />
+          </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+        <Text style={styles.text}>Завантажте фото</Text>
+      </View>
+
+      <View
+        style={{
+          ...styles.form,
+          marginBottom: isKeyboardShown ? 32 : 0,
+        }}
+      >
+        <TextInput
+          style={{
+            ...styles.input,
+            marginBottom: 16,
+          }}
+          placeholder={"Назва..."}
+          autoComplete={"off"}
+          autoCorrect={false}
+          selectionColor={"#bdbdbd"}
+          value={postName}
+          onChangeText={(value) => setPostName(value)}
+        />
+        <View>
+          <TextInput
+            style={{
+              ...styles.input,
+              paddingLeft: 25,
+            }}
+            placeholder={"Місцевість..."}
+            autoComplete={"off"}
+            autoCorrect={false}
+            selectionColor={"#bdbdbd"}
+            value={location}
+            onChangeText={(value) => setLocation(value)}
+          />
+
+          <LocationIcon style={styles.locationIcon} fill={"#bdbdbd"} />
+        </View>
+
+        {isKeyboardShown ? null : (
+          <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
+            <Text style={styles.btnText}>Опублікувати</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   main: {
     flex: 1,
     backgroundColor: "#ffffff",
-    paddingLeft: 16,
-    paddingRight: 16,
-    justifyContent: "flex-end",
   },
 
   photo: {
+    marginLeft: 16,
+    marginRight: 16,
     marginTop: 32,
-    width: "100%",
     height: 240,
     backgroundColor: "#f6f6f6",
     borderRadius: 8,
@@ -137,11 +133,15 @@ const styles = StyleSheet.create({
   text: {
     color: "#bdbdbd",
     fontSize: 16,
+    marginLeft: 16,
+    marginRight: 16,
     marginBottom: 32,
   },
 
   form: {
     backgroundColor: "#ffffff",
+    marginLeft: 16,
+    marginRight: 16,
   },
 
   input: {
