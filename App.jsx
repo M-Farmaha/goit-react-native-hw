@@ -33,20 +33,18 @@ export default App = () => {
         <StatusBar style="auto" />
         <NavigationContainer>
           {!isLogined ? (
-            <>
-              <AuthStack.Navigator>
-                <AuthStack.Screen
-                  name="Register"
-                  options={{ headerShown: false }}
-                  component={RegistrationScreen}
-                />
-                <AuthStack.Screen
-                  name="Login"
-                  options={{ headerShown: false }}
-                  component={LoginScreen}
-                />
-              </AuthStack.Navigator>
-            </>
+            <AuthStack.Navigator>
+              <AuthStack.Screen
+                name="Register"
+                options={{ headerShown: false }}
+                component={RegistrationScreen}
+              />
+              <AuthStack.Screen
+                name="Login"
+                options={{ headerShown: false }}
+                component={LoginScreen}
+              />
+            </AuthStack.Navigator>
           ) : (
             <Home isLogined={isLogined} setIsLogined={setIsLogined} />
           )}

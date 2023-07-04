@@ -11,70 +11,60 @@ export default CustomTabBar = ({ state, descriptors, navigation }) => {
     modifiedRoutes = [state.routes[0], state.routes[2], state.routes[1]];
   }
 
-  return (
-    <View style={showCreatePostsScreen ? styles.createPostsBar : styles.tabBar}>
-      {showCreatePostsScreen ? (
-        <TouchableOpacity activeOpacity={0.6}>
-          <View style={styles.deleteIcon}>
-            <DeleteIcon fill={"#bdbdbd"} />
-          </View>
-        </TouchableOpacity>
-      ) : (
-        modifiedRoutes.map((route, index) => {
-          const { options } = descriptors[route.key];
+  return showCreatePostsScreen ? null : (
+    <View style={styles.tabBar}>
+      {modifiedRoutes.map((route, index) => {
+        const { options } = descriptors[route.key];
 
-          const onPress = () => {
-            const event = navigation.emit({
-              type: "tabPress",
-              target: route.key,
-              canPreventDefault: true,
-            });
+        const onPress = () => {
+          const event = navigation.emit({
+            type: "tabPress",
+            target: route.key,
+            canPreventDefault: true,
+          });
 
-            if (!event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
-          };
+          if (!event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
 
-          const isFocused = index === 1;
+        const isFocused = index === 1;
 
-          let iconComponent;
-          if (isFocused && activeIndex === 2) {
-            if (index === 1) {
-              // Міняємо іконку для другої кнопки, коли активний третій скрін
-              iconComponent = options.tabBarIcon({
-                focused: isFocused,
-                swapped: true,
-              });
-            } else if (index === 2) {
-              // Міняємо іконку для третьої кнопки, коли активний третій скрін
-              iconComponent = options.tabBarIcon({
-                focused: isFocused,
-                swapped: true,
-              });
-            }
-          } else {
-            // Використовуємо звичайні іконки для всіх інших випадків
+        let iconComponent;
+        if (isFocused && activeIndex === 2) {
+          if (index === 1) {
+            // Міняємо іконку для другої кнопки, коли активний третій скрін
             iconComponent = options.tabBarIcon({
               focused: isFocused,
-              swapped: false,
+              swapped: true,
+            });
+          } else if (index === 2) {
+            // Міняємо іконку для третьої кнопки, коли активний третій скрін
+            iconComponent = options.tabBarIcon({
+              focused: isFocused,
+              swapped: true,
             });
           }
+        } else {
+          // Використовуємо звичайні іконки для всіх інших випадків
+          iconComponent = options.tabBarIcon({
+            focused: isFocused,
+            swapped: false,
+          });
+        }
 
-          return (
-            <TouchableOpacity
-              activeOpacity={0.6}
-              key={route.key}
-              onPress={onPress}
-            >
-              <View
-                style={[isFocused ? styles.activeIcon : styles.inactiveIcon]}
-              >
-                {options.tabBarIcon({ focused: isFocused })}
-              </View>
-            </TouchableOpacity>
-          );
-        })
-      )}
+        return (
+          <TouchableOpacity
+            activeOpacity={0.6}
+            key={route.key}
+            onPress={onPress}
+          >
+            <View style={[isFocused ? styles.activeIcon : styles.inactiveIcon]}>
+              {options.tabBarIcon({ focused: isFocused })}
+            </View>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };
@@ -111,16 +101,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderTopColor: "#b3b3b3",
     borderTopWidth: 0.5,
-    justifyContent: "center",
-    gap: 31,
-    paddingTop: 9,
-    paddingBottom: 34,
-  },
-
-  createPostsBar: {
-    flexDirection: "row",
-    height: 83,
-    backgroundColor: "#ffffff",
     justifyContent: "center",
     gap: 31,
     paddingTop: 9,
