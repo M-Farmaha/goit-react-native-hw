@@ -12,6 +12,7 @@ import { UserContext } from "./userContext";
 import RegistrationScreen from "./src/Screens/Auth/RegistrationScreen";
 import LoginScreen from "./src/Screens/Auth/LoginScreen";
 import Home from "./src/Screens/Main/Home";
+import AuthScreen from "./src/Screens/Auth/AuthScreen";
 
 export default App = () => {
   const [isLogined, setIsLogined] = useState(false);
@@ -35,14 +36,9 @@ export default App = () => {
           {!isLogined ? (
             <AuthStack.Navigator>
               <AuthStack.Screen
-                name="Register"
+                name="Auth"
                 options={{ headerShown: false }}
-                component={RegistrationScreen}
-              />
-              <AuthStack.Screen
-                name="Login"
-                options={{ headerShown: false }}
-                component={LoginScreen}
+                component={AuthScreen}
               />
             </AuthStack.Navigator>
           ) : (
@@ -57,6 +53,5 @@ export default App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "green",
   },
 });

@@ -1,3 +1,6 @@
+import * as ImagePicker from "expo-image-picker";
+import { manipulateAsync, FlipType } from "expo-image-manipulator";
+
 import {
   StyleSheet,
   Text,
@@ -7,6 +10,8 @@ import {
   Keyboard,
   Platform,
   Image,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
 } from "react-native";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -35,12 +40,22 @@ export default function CreatePostScreen() {
       Platform.OS == "ios" ? "keyboardWillShow" : "keyboardDidShow",
       () => {
         setIsKeyboardShown(true);
+        if (Platform.OS == "ios")
+          Keyboard.scheduleLayoutAnimation({
+            duration: 500,
+            easing: "keyboard",
+          });
       }
     );
     const hideKB = Keyboard.addListener(
       Platform.OS == "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => {
         setIsKeyboardShown(false);
+        if (Platform.OS == "ios")
+          Keyboard.scheduleLayoutAnimation({
+            duration: 500,
+            easing: "keyboard",
+          });
       }
     );
 
@@ -68,6 +83,13 @@ export default function CreatePostScreen() {
     return <Text>Permition for camera not granted...</Text>;
   }
 
+  if (hasMediaLibraryPermission === undefined) {
+    return <Text>Requesting permition...</Text>;
+  }
+  if (!hasMediaLibraryPermission) {
+    return <Text>Permition for library not granted...</Text>;
+  }
+
   const toggleCameraType = () => {
     setType((current) =>
       current === CameraType.back ? CameraType.front : CameraType.back
@@ -82,9 +104,18 @@ export default function CreatePostScreen() {
     };
 
     if (cameraRef) {
-      const { uri } = await cameraRef.takePictureAsync(options);
-      // await MediaLibrary.createAssetAsync(uri);
-      setPhoto(uri);
+      let photo = await cameraRef.takePictureAsync(options);
+
+      if (type === CameraType.front) {
+        photo = await manipulateAsync(
+          photo.localUri || photo.uri,
+          [{ flip: FlipType.Horizontal }],
+          { compress: 1 }
+        );
+      }
+
+      await MediaLibrary.createAssetAsync(photo.uri);
+      setPhoto(photo.uri);
     }
   };
 
@@ -92,121 +123,150 @@ export default function CreatePostScreen() {
     setPhoto(null);
   };
 
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setPhoto(result.assets[0].uri);
+    }
+  };
+
   return (
-    <View
-      style={{
-        ...styles.main,
-        justifyContent: isKeyboardShown ? "flex-end" : "flex-start",
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
       }}
     >
-      <View>
-        <Camera style={styles.camera} type={type} ref={setCameraRef}>
-          {photo && (
-            <View style={styles.photo}>
-              <Image
-                source={{ uri: photo }}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                }}
-              />
-            </View>
-          )}
-
-          {photo ? (
-            <TouchableOpacity
-              style={styles.addPhoto}
-              activeOpacity={0.6}
-              onPress={deletePicture}
-            >
-              <DeleteIcon fill={"#ffffff"} />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={styles.addPhoto}
-              activeOpacity={0.6}
-              onPress={takePicture}
-            >
-              <AddPhotoIcon fill={"#ffffff"} />
-            </TouchableOpacity>
-          )}
-
-          {!photo && (
-            <TouchableOpacity
-              style={styles.toggleCameraType}
-              activeOpacity={0.6}
-              onPress={toggleCameraType}
-            >
-              <SyncIcon fill={"#ffffff"} />
-            </TouchableOpacity>
-          )}
-        </Camera>
-        <Text style={styles.text}>Завантажте фото</Text>
-      </View>
-
-      <View
-        style={{
-          flex: isKeyboardShown ? 0 : 1,
-          justifyContent: "space-between",
-          marginBottom: 34,
-        }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS == "ios" ? "padding" : "height"}
+        style={styles.container}
       >
         <View
           style={{
-            ...styles.form,
-            marginBottom: isKeyboardShown ? 0 : 0,
+            ...styles.main,
+            marginBottom: isKeyboardShown ? 122 : 34,
           }}
         >
-          <TextInput
-            style={{
-              ...styles.input,
-              marginBottom: 16,
-            }}
-            placeholder={"Назва..."}
-            autoComplete={"off"}
-            autoCorrect={false}
-            selectionColor={"#bdbdbd"}
-            value={postName}
-            onChangeText={(value) => setPostName(value)}
-          />
           <View>
-            <TextInput
-              style={{
-                ...styles.input,
-                paddingLeft: 25,
-              }}
-              placeholder={"Місцевість..."}
-              autoComplete={"off"}
-              autoCorrect={false}
-              selectionColor={"#bdbdbd"}
-              value={location}
-              onChangeText={(value) => setLocation(value)}
-            />
+            <View>
+              <Camera style={styles.camera} type={type} ref={setCameraRef}>
+                {photo && (
+                  <View style={styles.photo}>
+                    <Image
+                      source={{ uri: photo }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    />
+                  </View>
+                )}
 
-            <LocationIcon style={styles.locationIcon} fill={"#bdbdbd"} />
+                {photo ? (
+                  <TouchableOpacity
+                    style={styles.addPhoto}
+                    activeOpacity={0.6}
+                    onPress={deletePicture}
+                  >
+                    <DeleteIcon fill={"#ffffff"} />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addPhoto}
+                    activeOpacity={0.6}
+                    onPress={takePicture}
+                  >
+                    <AddPhotoIcon fill={"#ffffff"} />
+                  </TouchableOpacity>
+                )}
+
+                {!photo && (
+                  <TouchableOpacity
+                    style={styles.toggleCameraType}
+                    activeOpacity={0.6}
+                    onPress={toggleCameraType}
+                  >
+                    <SyncIcon fill={"#ffffff"} />
+                  </TouchableOpacity>
+                )}
+              </Camera>
+              <TouchableOpacity
+                style={styles.pickImageBtn}
+                activeOpacity={0.6}
+                onPress={pickImage}
+              >
+                <Text style={styles.pickImageBtntext}>
+                  {photo ? "Редагувати фото" : "Завантажте фото"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.form}>
+              <TextInput
+                style={{
+                  ...styles.input,
+                  marginBottom: 16,
+                }}
+                placeholder={"Назва..."}
+                autoComplete={"off"}
+                autoCorrect={false}
+                selectionColor={"#bdbdbd"}
+                value={postName}
+                onChangeText={(value) => setPostName(value)}
+              />
+              <View>
+                <TextInput
+                  style={{
+                    ...styles.input,
+                    paddingLeft: 25,
+                  }}
+                  placeholder={"Місцевість..."}
+                  autoComplete={"off"}
+                  autoCorrect={false}
+                  selectionColor={"#bdbdbd"}
+                  value={location}
+                  onChangeText={(value) => setLocation(value)}
+                />
+
+                <LocationIcon style={styles.locationIcon} fill={"#bdbdbd"} />
+              </View>
+
+              {!isKeyboardShown && (
+                <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
+                  <Text style={styles.btnText}>Опублікувати</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
           {!isKeyboardShown && (
-            <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
-              <Text style={styles.btnText}>Опублікувати</Text>
+            <TouchableOpacity activeOpacity={0.6} style={styles.deleteBtn}>
+              <View>
+                <DeleteIcon fill={"#bdbdbd"} />
+              </View>
             </TouchableOpacity>
           )}
         </View>
-        {!isKeyboardShown && (
-          <TouchableOpacity activeOpacity={0.6} style={styles.deleteBtn}>
-            <View>
-              <DeleteIcon fill={"#bdbdbd"} />
-            </View>
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "#ffffff",
+  },
+
   main: {
     flex: 1,
+    justifyContent: "flex-end",
     backgroundColor: "#ffffff",
   },
 
@@ -243,14 +303,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff40",
     justifyContent: "center",
     alignItems: "center",
-  },
-
-  text: {
-    color: "#BDBDBD",
-    fontSize: 16,
-    marginLeft: 16,
-    marginRight: 16,
-    marginBottom: 32,
   },
 
   form: {
@@ -294,5 +346,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
+    marginTop: "auto",
+  },
+
+  pickImageBtn: {
+    marginLeft: 16,
+    marginRight: "auto",
+    marginBottom: 32,
+  },
+
+  pickImageBtntext: {
+    color: "#BDBDBD",
+    fontSize: 16,
   },
 });
