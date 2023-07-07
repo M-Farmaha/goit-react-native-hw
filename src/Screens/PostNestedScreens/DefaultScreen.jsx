@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Image } from "react-native";
 
 import ProfilePhoto from "../../images/profile-photo.jpg";
 
-export default function PostsScreen() {
+export default function DefaultScreen() {
   return (
     <View style={styles.main}>
       <View style={styles.profile}>

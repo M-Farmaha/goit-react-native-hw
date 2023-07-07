@@ -1,27 +1,11 @@
-import {
-  StyleSheet,
-  Image,
-  View,
-  Text,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { StyleSheet, Image, View, Text, TouchableOpacity } from "react-native";
 
-import { useUser } from "../../../userContext";
-
-import LogOutIcon from "../../images/log-out-icon.svg";
 import AddIcon from "../../images/add-icon.svg";
 import BG from "../../images/photo-bg.jpg";
 import ProfilePhoto from "../../images/profile-photo.jpg";
+import LogOutButton from "../../Components/LogOutButton";
 
 export default ProfileScreen = () => {
-  const { setIsLogined } = useUser();
-
-  const handleLogOutPress = () => {
-    Alert.alert("Виконано вихід");
-    setIsLogined(false);
-  };
-
   return (
     <View style={styles.wrap}>
       <Image source={BG} style={styles.bg} />
@@ -35,13 +19,17 @@ export default ProfileScreen = () => {
             <AddIcon width={13} height={13} fill={"#E8E8E8"} />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.logOutBtn}
-          activeOpacity={0.6}
-          onPress={handleLogOutPress}
-        >
-          <LogOutIcon fill={"#BDBDBD"} />
-        </TouchableOpacity>
+
+        <LogOutButton
+          style={{
+            position: "absolute",
+            top: 12,
+            right: 6,
+            padding: 10,
+            backgroundColor: "#ff61ff",
+          }}
+        />
+
         <Text style={styles.title}>Max Farmaha</Text>
       </View>
     </View>
@@ -96,12 +84,6 @@ const styles = StyleSheet.create({
   profilePhoto: {
     width: 120,
     height: 120,
-  },
-
-  logOutBtn: {
-    position: "absolute",
-    right: 16,
-    top: 22,
   },
 
   removeBtn: {

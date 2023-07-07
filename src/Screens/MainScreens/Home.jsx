@@ -1,14 +1,5 @@
 import "react-native-gesture-handler";
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Alert,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Platform,
-  Keyboard,
-} from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -17,20 +8,15 @@ import CreatePostScreen from "./CreatePostScreen";
 import ProfileScreen from "./ProfileScreen";
 import CustomTabBar from "../../Components/CustomTabBar";
 
-import LogOutIcon from "../../images/log-out-icon.svg";
 import GridIcon from "../../images/grid-icon.svg";
 import UserIcon from "../../images/user-icon.svg";
 import AddIcon from "../../images/add-icon.svg";
 import BackIcon from "../../images//back-icon.svg";
+import LogOutButton from "../../Components/LogOutButton";
 
-export default Home = ({ isLogined, setIsLogined }) => {
+export default Home = () => {
   const Tab = createBottomTabNavigator();
   const navigation = useNavigation();
-
-  const handleLogOutPress = () => {
-    Alert.alert("Виконано вихід");
-    setIsLogined(false);
-  };
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -52,13 +38,15 @@ export default Home = ({ isLogined, setIsLogined }) => {
           headerStyle: styles.header,
           headerTitleStyle: styles.title,
           headerRight: () => (
-            <TouchableOpacity
-              style={{ marginRight: 16 }}
-              activeOpacity={0.6}
-              onPress={handleLogOutPress}
-            >
-              <LogOutIcon fill={"#BDBDBD"} />
-            </TouchableOpacity>
+            <LogOutButton
+              style={{
+                position: "absolute",
+                top: 0,
+                right: 6,
+                padding: 10,
+                backgroundColor: "#ff61ff",
+              }}
+            />
           ),
           tabBarIcon: ({ focused }) => (
             <GridIcon fill={focused ? "#ffffff" : "#4d4d4d"} />
@@ -75,7 +63,11 @@ export default Home = ({ isLogined, setIsLogined }) => {
           headerTitleStyle: styles.title,
           headerLeft: () => (
             <TouchableOpacity
-              style={{ marginLeft: 16 }}
+              style={{
+                marginLeft: 16,
+                padding: 10,
+                backgroundColor: "#ff61ff",
+              }}
               activeOpacity={0.6}
               onPress={handleBackPress}
             >

@@ -14,7 +14,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Camera, CameraType } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
@@ -25,8 +25,8 @@ import LocationIcon from "../../images/location-icon.svg";
 import SyncIcon from "../../images/sync-icon.svg";
 
 export default function CreatePostScreen() {
-  const [postName, setPostName] = useState();
-  const [location, setLocation] = useState();
+  const [postName, setPostName] = useState("");
+  const [location, setLocation] = useState("");
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
 
   const [hasCameraPermission, setHasCameraPermission] = useState();
@@ -136,6 +136,15 @@ export default function CreatePostScreen() {
     }
   };
 
+  const clearPost = () => {
+    deletePicture();
+    setPostName("");
+    setLocation("");
+  };
+
+  const disabledPostBtn = !photo || !postName || !location;
+  const disabledDeleteBtn = !photo && !postName && !location;
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -237,17 +246,39 @@ export default function CreatePostScreen() {
               </View>
 
               {!isKeyboardShown && (
-                <TouchableOpacity style={styles.btn} activeOpacity={0.6}>
-                  <Text style={styles.btnText}>Опублікувати</Text>
+                <TouchableOpacity
+                  disabled={disabledPostBtn}
+                  activeOpacity={0.6}
+                  style={{
+                    ...styles.postBtn,
+                    backgroundColor: disabledPostBtn ? "#f6f6f6" : "#FF6C00",
+                  }}
+                >
+                  <Text
+                    style={{
+                      ...styles.btnText,
+                      color: disabledPostBtn ? "#bdbdbd" : "#ffffff",
+                    }}
+                  >
+                    Опублікувати
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
 
           {!isKeyboardShown && (
-            <TouchableOpacity activeOpacity={0.6} style={styles.deleteBtn}>
+            <TouchableOpacity
+              disabled={disabledDeleteBtn}
+              activeOpacity={0.6}
+              style={{
+                ...styles.deleteBtn,
+                backgroundColor: disabledDeleteBtn ? "#f6f6f6" : "#FF6C00",
+              }}
+              onPress={clearPost}
+            >
               <View>
-                <DeleteIcon fill={"#bdbdbd"} />
+                <DeleteIcon fill={disabledDeleteBtn ? "#bdbdbd" : "#ffffff"} />
               </View>
             </TouchableOpacity>
           )}
@@ -286,8 +317,10 @@ const styles = StyleSheet.create({
 
   toggleCameraType: {
     position: "absolute",
-    bottom: 16,
-    right: 16,
+    bottom: 6,
+    right: 6,
+    padding: 10,
+    backgroundColor: "#ff61ff",
   },
 
   photo: {
@@ -324,8 +357,7 @@ const styles = StyleSheet.create({
     top: 14,
   },
 
-  btn: {
-    backgroundColor: "#F6F6F6",
+  postBtn: {
     borderRadius: 100,
     height: 50,
     marginTop: 32,
@@ -334,14 +366,13 @@ const styles = StyleSheet.create({
   },
 
   btnText: {
-    color: "#BDBDBD",
     fontSize: 16,
   },
 
   deleteBtn: {
     width: 70,
     height: 40,
-    backgroundColor: "#f6f6f6",
+
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",

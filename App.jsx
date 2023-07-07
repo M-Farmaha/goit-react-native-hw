@@ -9,10 +9,10 @@ import { useFonts } from "expo-font";
 
 import { UserContext } from "./userContext";
 
-import RegistrationScreen from "./src/Screens/Auth/RegistrationScreen";
-import LoginScreen from "./src/Screens/Auth/LoginScreen";
-import Home from "./src/Screens/Main/Home";
-import AuthScreen from "./src/Screens/Auth/AuthScreen";
+import Home from "./src/Screens/MainScreens/Home";
+import AuthScreen from "./src/Screens/AuthScreens/AuthScreen";
+
+const AuthStack = createStackNavigator();
 
 export default App = () => {
   const [isLogined, setIsLogined] = useState(false);
@@ -21,8 +21,6 @@ export default App = () => {
     "Roboto-Medium": require("./src/fonts/Roboto-Medium.ttf"),
     "Roboto-Bold": require("./src/fonts/Roboto-Bold.ttf"),
   });
-
-  const AuthStack = createStackNavigator();
 
   if (!fontsLoaded) {
     return null;
@@ -42,7 +40,7 @@ export default App = () => {
               />
             </AuthStack.Navigator>
           ) : (
-            <Home isLogined={isLogined} setIsLogined={setIsLogined} />
+            <Home setIsLogined={setIsLogined} />
           )}
         </NavigationContainer>
       </View>
