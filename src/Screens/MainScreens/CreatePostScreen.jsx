@@ -24,15 +24,16 @@ import AddPhotoIcon from "../../images/addphoto-icon.svg";
 import LocationIcon from "../../images/location-icon.svg";
 import SyncIcon from "../../images/sync-icon.svg";
 
-export default function CreatePostScreen() {
-  const [postName, setPostName] = useState("");
-  const [location, setLocation] = useState("");
+export default CreatePostScreen = ({ navigation }) => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
 
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(CameraType.back);
+
+  const [postName, setPostName] = useState("");
+  const [location, setLocation] = useState("");
   const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
@@ -140,6 +141,11 @@ export default function CreatePostScreen() {
     deletePicture();
     setPostName("");
     setLocation("");
+  };
+
+  const publishPost = () => {
+    navigation.navigate("DefaultScreen", { postName, location, photo });
+    clearPost();
   };
 
   const disabledPostBtn = !photo || !postName || !location;
@@ -253,6 +259,7 @@ export default function CreatePostScreen() {
                     ...styles.postBtn,
                     backgroundColor: disabledPostBtn ? "#f6f6f6" : "#FF6C00",
                   }}
+                  onPress={publishPost}
                 >
                   <Text
                     style={{
@@ -286,7 +293,7 @@ export default function CreatePostScreen() {
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -308,11 +315,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#f6f6f6",
     borderRadius: 8,
     overflow: "hidden",
-    borderColor: "#e8e8e8",
-    borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 8,
   },
 
   toggleCameraType: {
@@ -320,7 +324,7 @@ const styles = StyleSheet.create({
     bottom: 6,
     right: 6,
     padding: 10,
-    backgroundColor: "#ff61ff",
+    backgroundColor: "#99ff7a",
   },
 
   photo: {
@@ -381,9 +385,11 @@ const styles = StyleSheet.create({
   },
 
   pickImageBtn: {
-    marginLeft: 16,
+    marginLeft: 6,
     marginRight: "auto",
-    marginBottom: 32,
+    marginBottom: 22,
+    backgroundColor: "#99ff7a",
+    padding: 10,
   },
 
   pickImageBtntext: {

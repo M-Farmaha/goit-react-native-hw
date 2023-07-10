@@ -26,7 +26,7 @@ export default ProfileScreen = () => {
             top: 12,
             right: 6,
             padding: 10,
-            backgroundColor: "#ff61ff",
+            backgroundColor: "#99ff7a",
           }}
         />
 

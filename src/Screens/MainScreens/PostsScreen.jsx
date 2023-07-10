@@ -6,22 +6,24 @@ import CommentsScreen from "../PostNestedScreens/ComentsScreen";
 
 const PostNestedNavigation = createStackNavigator();
 
-export default function PostsScreen() {
+export default PostsScreen = () => {
   return (
     <PostNestedNavigation.Navigator>
+      <PostNestedNavigation.Screen
+        name="DefaultScreen"
+        component={DefaultScreen}
+        options={{ headerShown: false }}
+      />
       <PostNestedNavigation.Screen
         name="MapScreen"
         component={MapScreen}
         options={{ headerShown: false }}
       />
       <PostNestedNavigation.Screen
-        name="DefaultScreen"
-        component={DefaultScreen}
-      />
-      <PostNestedNavigation.Screen
         name="CommentsScreen"
         component={CommentsScreen}
+        options={{ headerShown: false }}
       />
     </PostNestedNavigation.Navigator>
   );
-}
+};

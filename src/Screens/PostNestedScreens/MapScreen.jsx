@@ -1,13 +1,13 @@
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
-export default function MapScreen() {
+export default MapScreen = () => {
   return (
     <View style={styles.container}>
       <MapView style={styles.mapStyle}></MapView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

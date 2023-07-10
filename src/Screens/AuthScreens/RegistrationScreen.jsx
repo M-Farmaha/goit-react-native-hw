@@ -98,7 +98,7 @@ export default RegistrationScreen = ({
                 right: 6,
                 top: 4,
                 padding: 10,
-                backgroundColor: "#ff61ff",
+                backgroundColor: "#99ff7a",
               }}
               activeOpacity={0.6}
               onPress={() => setShowPassword((prevState) => !prevState)}
