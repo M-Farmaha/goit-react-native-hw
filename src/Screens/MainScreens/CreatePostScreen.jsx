@@ -27,14 +27,20 @@ import SyncIcon from "../../images/sync-icon.svg";
 export default CreatePostScreen = ({ navigation }) => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
 
-  const [hasCameraPermission, setHasCameraPermission] = useState();
-  const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
-  const [cameraRef, setCameraRef] = useState(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [hasMediaLibraryPermission, setHasMediaLibraryPermission] =
+    useState(null);
+
   const [type, setType] = useState(CameraType.back);
 
   const [postName, setPostName] = useState("");
   const [location, setLocation] = useState("");
   const [photo, setPhoto] = useState(null);
+
+  const [cameraRef, setCameraRef] = useState(null);
+
+  const disabledPostBtn = !photo || !postName || !location;
+  const disabledDeleteBtn = !photo && !postName && !location;
 
   useEffect(() => {
     const showKB = Keyboard.addListener(
@@ -69,27 +75,13 @@ export default CreatePostScreen = ({ navigation }) => {
   useEffect(() => {
     (async () => {
       const cameraPermission = await Camera.requestCameraPermissionsAsync();
+      setHasCameraPermission(cameraPermission.granted);
+
       const mediaLibraryPermisson =
         await MediaLibrary.requestPermissionsAsync();
-
-      setHasCameraPermission(cameraPermission.status === "granted");
-      setHasMediaLibraryPermission(mediaLibraryPermisson.status === "granted");
+      setHasMediaLibraryPermission(mediaLibraryPermisson.granted);
     })();
   }, []);
-
-  if (hasCameraPermission === undefined) {
-    return <Text>Requesting permition...</Text>;
-  }
-  if (!hasCameraPermission) {
-    return <Text>Permition for camera not granted...</Text>;
-  }
-
-  if (hasMediaLibraryPermission === undefined) {
-    return <Text>Requesting permition...</Text>;
-  }
-  if (!hasMediaLibraryPermission) {
-    return <Text>Permition for library not granted...</Text>;
-  }
 
   const toggleCameraType = () => {
     setType((current) =>
@@ -101,7 +93,6 @@ export default CreatePostScreen = ({ navigation }) => {
     const options = {
       quality: 1,
       base64: true,
-      exif: false,
     };
 
     if (cameraRef) {
@@ -115,7 +106,7 @@ export default CreatePostScreen = ({ navigation }) => {
         );
       }
 
-      await MediaLibrary.createAssetAsync(photo.uri);
+      // await MediaLibrary.createAssetAsync(photo.uri);
       setPhoto(photo.uri);
     }
   };
@@ -126,9 +117,8 @@ export default CreatePostScreen = ({ navigation }) => {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [16, 9],
       quality: 1,
     });
 
@@ -148,8 +138,19 @@ export default CreatePostScreen = ({ navigation }) => {
     clearPost();
   };
 
-  const disabledPostBtn = !photo || !postName || !location;
-  const disabledDeleteBtn = !photo && !postName && !location;
+  if (hasCameraPermission === null) {
+    return <Text>Requesting camera permition...</Text>;
+  }
+  if (hasCameraPermission === false) {
+    return <Text>Permition for camera not granted...</Text>;
+  }
+
+  if (hasMediaLibraryPermission === null) {
+    return <Text>Requesting library permition...</Text>;
+  }
+  if (hasMediaLibraryPermission === false) {
+    return <Text>Permition for library not granted...</Text>;
+  }
 
   return (
     <TouchableWithoutFeedback
@@ -169,47 +170,55 @@ export default CreatePostScreen = ({ navigation }) => {
         >
           <View>
             <View>
-              <Camera style={styles.camera} type={type} ref={setCameraRef}>
-                {photo && (
-                  <View style={styles.photo}>
-                    <Image
-                      source={{ uri: photo }}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                      }}
-                    />
-                  </View>
-                )}
+              <View style={styles.cameraWrap}>
+                <Camera
+                  style={styles.camera}
+                  ratio={"1:1"}
+                  type={type}
+                  ref={setCameraRef}
+                >
+                  {photo && (
+                    <View style={styles.photo}>
+                      <Image
+                        source={{ uri: photo }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      />
+                    </View>
+                  )}
 
-                {photo ? (
-                  <TouchableOpacity
-                    style={styles.addPhoto}
-                    activeOpacity={0.6}
-                    onPress={deletePicture}
-                  >
-                    <DeleteIcon fill={"#ffffff"} />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.addPhoto}
-                    activeOpacity={0.6}
-                    onPress={takePicture}
-                  >
-                    <AddPhotoIcon fill={"#ffffff"} />
-                  </TouchableOpacity>
-                )}
+                  {photo ? (
+                    <TouchableOpacity
+                      style={styles.addPhoto}
+                      activeOpacity={0.6}
+                      onPress={deletePicture}
+                    >
+                      <DeleteIcon fill={"#ffffff"} />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.addPhoto}
+                      activeOpacity={0.6}
+                      onPress={takePicture}
+                    >
+                      <AddPhotoIcon fill={"#ffffff"} />
+                    </TouchableOpacity>
+                  )}
 
-                {!photo && (
-                  <TouchableOpacity
-                    style={styles.toggleCameraType}
-                    activeOpacity={0.6}
-                    onPress={toggleCameraType}
-                  >
-                    <SyncIcon fill={"#ffffff"} />
-                  </TouchableOpacity>
-                )}
-              </Camera>
+                  {!photo && (
+                    <TouchableOpacity
+                      style={styles.toggleCameraType}
+                      activeOpacity={0.6}
+                      onPress={toggleCameraType}
+                    >
+                      <SyncIcon fill={"#ffffff"} />
+                    </TouchableOpacity>
+                  )}
+                </Camera>
+              </View>
+
               <TouchableOpacity
                 style={styles.pickImageBtn}
                 activeOpacity={0.6}
@@ -308,13 +317,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
 
-  camera: {
+  cameraWrap: {
     marginHorizontal: 16,
     marginTop: 32,
     height: 240,
     backgroundColor: "#f6f6f6",
     borderRadius: 8,
     overflow: "hidden",
+  },
+
+  camera: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
