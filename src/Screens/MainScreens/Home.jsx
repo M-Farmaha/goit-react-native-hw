@@ -12,7 +12,6 @@ import GridIcon from "../../images/grid-icon.svg";
 import UserIcon from "../../images/user-icon.svg";
 import AddIcon from "../../images/add-icon.svg";
 import BackIcon from "../../images//back-icon.svg";
-import LogOutButton from "../../Components/LogOutButton";
 
 export default Home = () => {
   const Tab = createBottomTabNavigator();
@@ -33,21 +32,7 @@ export default Home = () => {
         name="Posts"
         component={PostsScreen}
         options={{
-          title: "Публікації",
-          headerTitleAlign: "center",
-          headerStyle: styles.header,
-          headerTitleStyle: styles.title,
-          headerRight: () => (
-            <LogOutButton
-              style={{
-                position: "absolute",
-                top: 0,
-                right: 6,
-                padding: 10,
-                backgroundColor: "#99ff7a",
-              }}
-            />
-          ),
+          headerShown: false,
           tabBarIcon: ({ focused }) => (
             <GridIcon fill={focused ? "#ffffff" : "#4d4d4d"} />
           ),
@@ -64,7 +49,7 @@ export default Home = () => {
           headerLeft: () => (
             <TouchableOpacity
               style={{
-                marginLeft: 16,
+                marginLeft: 6,
                 padding: 10,
                 backgroundColor: "#99ff7a",
               }}

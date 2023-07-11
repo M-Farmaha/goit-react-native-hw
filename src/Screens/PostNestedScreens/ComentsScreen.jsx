@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 
-export default CommentsScreen = () => {
+export default CommentsScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <Text>COMMENTS</Text>

@@ -12,7 +12,7 @@ import CommentIcon from "../../images/comment-icon.svg";
 import LocationIcon from "../../images/location-icon.svg";
 import ProfilePhoto from "../../images/profile-photo.jpg";
 
-export default DefaultScreen = ({ route }) => {
+export default DefaultScreen = ({ route, navigation }) => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
@@ -46,6 +46,11 @@ export default DefaultScreen = ({ route }) => {
               <TouchableOpacity
                 style={styles.commentButton}
                 activeOpacity={0.6}
+                onPress={() => {
+                  navigation.navigate("CommentsScreen", {
+                    photo: item.photo,
+                  });
+                }}
               >
                 <CommentIcon stroke={"#BDBDBD"} strokeWidth={"1px"} />
                 <Text style={styles.commentAmount}>0</Text>
@@ -53,9 +58,16 @@ export default DefaultScreen = ({ route }) => {
               <TouchableOpacity
                 style={styles.locationButton}
                 activeOpacity={0.6}
+                onPress={() => {
+                  navigation.navigate("MapScreen", {
+                    postName: item.postName,
+                    locationName: item.locationName,
+                    coords: item.coords,
+                  });
+                }}
               >
                 <LocationIcon fill={"#bdbdbd"} />
-                <Text style={styles.locationText}>{item.location}</Text>
+                <Text style={styles.locationText}>{item.locationName}</Text>
               </TouchableOpacity>
             </View>
           </>

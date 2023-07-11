@@ -12,12 +12,14 @@ import {
   Image,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
 
 import React, { useState, useEffect } from "react";
 
 import { Camera, CameraType } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
+import * as Location from "expo-location";
 
 import DeleteIcon from "../../images/delete-icon.svg";
 import AddPhotoIcon from "../../images/addphoto-icon.svg";
@@ -28,19 +30,20 @@ export default CreatePostScreen = ({ navigation }) => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
 
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const [hasMediaLibraryPermission, setHasMediaLibraryPermission] =
-    useState(null);
+  const [hasLibraryPermission, setHasLibraryPermission] = useState(null);
+  const [hasLocationPermission, setHasLocationPermission] = useState(null);
 
+  const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(CameraType.back);
 
   const [postName, setPostName] = useState("");
-  const [location, setLocation] = useState("");
+  const [locationName, setLocationName] = useState("");
   const [photo, setPhoto] = useState(null);
 
-  const [cameraRef, setCameraRef] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const disabledPostBtn = !photo || !postName || !location;
-  const disabledDeleteBtn = !photo && !postName && !location;
+  const disabledPostBtn = !photo || !postName || !locationName || isLoading;
+  const disabledDeleteBtn = (!photo && !postName && !locationName) || isLoading;
 
   useEffect(() => {
     const showKB = Keyboard.addListener(
@@ -74,12 +77,15 @@ export default CreatePostScreen = ({ navigation }) => {
 
   useEffect(() => {
     (async () => {
-      const cameraPermission = await Camera.requestCameraPermissionsAsync();
+      let cameraPermission = await Camera.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraPermission.granted);
 
-      const mediaLibraryPermisson =
-        await MediaLibrary.requestPermissionsAsync();
-      setHasMediaLibraryPermission(mediaLibraryPermisson.granted);
+      let libraryPermisson = await MediaLibrary.requestPermissionsAsync();
+      setHasLibraryPermission(libraryPermisson.granted);
+
+      let locatiomPermission =
+        await Location.requestForegroundPermissionsAsync();
+      setHasLocationPermission(locatiomPermission.granted);
     })();
   }, []);
 
@@ -106,8 +112,8 @@ export default CreatePostScreen = ({ navigation }) => {
         );
       }
 
-      // await MediaLibrary.createAssetAsync(photo.uri);
       setPhoto(photo.uri);
+      // await MediaLibrary.createAssetAsync(photo.uri);
     }
   };
 
@@ -130,26 +136,46 @@ export default CreatePostScreen = ({ navigation }) => {
   const clearPost = () => {
     deletePicture();
     setPostName("");
-    setLocation("");
+    setLocationName("");
   };
 
-  const publishPost = () => {
-    navigation.navigate("DefaultScreen", { postName, location, photo });
+  const publishPost = async () => {
+    setIsLoading(true);
+    let location = await Location.getCurrentPositionAsync({});
+    const coords = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+
+    navigation.navigate("DefaultScreen", {
+      postName,
+      locationName,
+      photo,
+      coords,
+    });
     clearPost();
+    setIsLoading(false);
   };
 
   if (hasCameraPermission === null) {
     return <Text>Requesting camera permition...</Text>;
   }
   if (hasCameraPermission === false) {
-    return <Text>Permition for camera not granted...</Text>;
+    return <Text>Permition for camera not granted</Text>;
   }
 
-  if (hasMediaLibraryPermission === null) {
+  if (hasLibraryPermission === null) {
     return <Text>Requesting library permition...</Text>;
   }
-  if (hasMediaLibraryPermission === false) {
-    return <Text>Permition for library not granted...</Text>;
+  if (hasLibraryPermission === false) {
+    return <Text>Permition for library not granted</Text>;
+  }
+
+  if (hasLocationPermission === null) {
+    return <Text>Requesting location permition...</Text>;
+  }
+  if (hasLocationPermission === false) {
+    return <Text>Permission to access location not granted</Text>;
   }
 
   return (
@@ -194,6 +220,7 @@ export default CreatePostScreen = ({ navigation }) => {
                       style={styles.addPhoto}
                       activeOpacity={0.6}
                       onPress={deletePicture}
+                      disabled={isLoading}
                     >
                       <DeleteIcon fill={"#ffffff"} />
                     </TouchableOpacity>
@@ -202,6 +229,7 @@ export default CreatePostScreen = ({ navigation }) => {
                       style={styles.addPhoto}
                       activeOpacity={0.6}
                       onPress={takePicture}
+                      disabled={isLoading}
                     >
                       <AddPhotoIcon fill={"#ffffff"} />
                     </TouchableOpacity>
@@ -212,6 +240,7 @@ export default CreatePostScreen = ({ navigation }) => {
                       style={styles.toggleCameraType}
                       activeOpacity={0.6}
                       onPress={toggleCameraType}
+                      disabled={isLoading}
                     >
                       <SyncIcon fill={"#ffffff"} />
                     </TouchableOpacity>
@@ -223,6 +252,7 @@ export default CreatePostScreen = ({ navigation }) => {
                 style={styles.pickImageBtn}
                 activeOpacity={0.6}
                 onPress={pickImage}
+                disabled={isLoading}
               >
                 <Text style={styles.pickImageBtntext}>
                   {photo ? "Редагувати фото" : "Завантажте фото"}
@@ -253,8 +283,8 @@ export default CreatePostScreen = ({ navigation }) => {
                   autoComplete={"off"}
                   autoCorrect={false}
                   selectionColor={"#bdbdbd"}
-                  value={location}
-                  onChangeText={(value) => setLocation(value)}
+                  value={locationName}
+                  onChangeText={(value) => setLocationName(value)}
                 />
 
                 <LocationIcon style={styles.locationIcon} fill={"#bdbdbd"} />
@@ -270,14 +300,18 @@ export default CreatePostScreen = ({ navigation }) => {
                   }}
                   onPress={publishPost}
                 >
-                  <Text
-                    style={{
-                      ...styles.btnText,
-                      color: disabledPostBtn ? "#bdbdbd" : "#ffffff",
-                    }}
-                  >
-                    Опублікувати
-                  </Text>
+                  {isLoading ? (
+                    <ActivityIndicator size={"large"} />
+                  ) : (
+                    <Text
+                      style={{
+                        ...styles.btnText,
+                        color: disabledPostBtn ? "#bdbdbd" : "#ffffff",
+                      }}
+                    >
+                      Опублікувати
+                    </Text>
+                  )}
                 </TouchableOpacity>
               )}
             </View>
