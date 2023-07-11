@@ -22,11 +22,11 @@ export default Home = () => {
   };
   return (
     <Tab.Navigator
+      tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
         tabBarShowLabel: false,
         tabBarStyle: styles.bottomTab,
       }}
-      tabBar={(props) => <CustomTabBar {...props} />}
     >
       <Tab.Screen
         name="Posts"

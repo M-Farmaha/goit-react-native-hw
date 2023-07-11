@@ -1,71 +1,76 @@
 import { StyleSheet, View, TouchableOpacity } from "react-native";
-import DeleteIcon from "../images/delete-icon.svg";
 
 export default CustomTabBar = ({ state, descriptors, navigation }) => {
   let modifiedRoutes = state.routes;
 
   const activeIndex = state.index;
   const showCreatePostsScreen = activeIndex === 1;
+  const showNestedPostsScreens = state.routes[0].state?.index === 1;
 
   if (activeIndex === 2) {
     modifiedRoutes = [state.routes[0], state.routes[2], state.routes[1]];
   }
 
-  return showCreatePostsScreen ? null : (
-    <View style={styles.tabBar}>
-      {modifiedRoutes.map((route, index) => {
-        const { options } = descriptors[route.key];
+  return (
+    !showCreatePostsScreen &&
+    !showNestedPostsScreens && (
+      <View style={styles.tabBar}>
+        {modifiedRoutes.map((route, index) => {
+          const { options } = descriptors[route.key];
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: "tabPress",
-            target: route.key,
-            canPreventDefault: true,
-          });
+          const onPress = () => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            });
 
-          if (!event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
+            if (!event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
 
-        const isFocused = index === 1;
+          const isFocused = index === 1;
 
-        let iconComponent;
-        if (isFocused && activeIndex === 2) {
-          if (index === 1) {
-            // Міняємо іконку для другої кнопки, коли активний третій скрін
+          let iconComponent;
+          if (isFocused && activeIndex === 2) {
+            if (index === 1) {
+              // Міняємо іконку для другої кнопки, коли активний третій скрін
+              iconComponent = options.tabBarIcon({
+                focused: isFocused,
+                swapped: true,
+              });
+            } else if (index === 2) {
+              // Міняємо іконку для третьої кнопки, коли активний третій скрін
+              iconComponent = options.tabBarIcon({
+                focused: isFocused,
+                swapped: true,
+              });
+            }
+          } else {
+            // Використовуємо звичайні іконки для всіх інших випадків
             iconComponent = options.tabBarIcon({
               focused: isFocused,
-              swapped: true,
-            });
-          } else if (index === 2) {
-            // Міняємо іконку для третьої кнопки, коли активний третій скрін
-            iconComponent = options.tabBarIcon({
-              focused: isFocused,
-              swapped: true,
+              swapped: false,
             });
           }
-        } else {
-          // Використовуємо звичайні іконки для всіх інших випадків
-          iconComponent = options.tabBarIcon({
-            focused: isFocused,
-            swapped: false,
-          });
-        }
 
-        return (
-          <TouchableOpacity
-            activeOpacity={0.6}
-            key={route.key}
-            onPress={onPress}
-          >
-            <View style={[isFocused ? styles.activeIcon : styles.inactiveIcon]}>
-              {options.tabBarIcon({ focused: isFocused })}
-            </View>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
+          return (
+            <TouchableOpacity
+              activeOpacity={0.6}
+              key={route.key}
+              onPress={onPress}
+            >
+              <View
+                style={[isFocused ? styles.activeIcon : styles.inactiveIcon]}
+              >
+                {options.tabBarIcon({ focused: isFocused })}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    )
   );
 };
 
