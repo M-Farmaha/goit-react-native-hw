@@ -58,7 +58,7 @@ export default PostsScreen = () => {
               activeOpacity={0.6}
               onPress={handleBackPress}
             >
-              <BackIcon fill={"#BDBDBD"} />
+              <BackIcon fill={"#212121"} />
             </TouchableOpacity>
           ),
         }}
@@ -81,7 +81,7 @@ export default PostsScreen = () => {
               activeOpacity={0.6}
               onPress={handleBackPress}
             >
-              <BackIcon fill={"#BDBDBD"} />
+              <BackIcon fill={"#212121"} />
             </TouchableOpacity>
           ),
         }}

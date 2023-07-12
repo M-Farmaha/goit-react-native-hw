@@ -56,7 +56,7 @@ export default Home = () => {
               activeOpacity={0.6}
               onPress={handleBackPress}
             >
-              <BackIcon fill={"#BDBDBD"} />
+              <BackIcon fill={"#212121"} />
             </TouchableOpacity>
           ),
           tabBarIcon: ({ focused }) => (

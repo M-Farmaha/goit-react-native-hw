@@ -141,10 +141,10 @@ export default CreatePostScreen = ({ navigation }) => {
 
   const publishPost = async () => {
     setIsLoading(true);
-    let location = await Location.getCurrentPositionAsync({});
+    // let location = await Location.getCurrentPositionAsync({});
     const coords = {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
+      latitude: 50.49328581644981,
+      longitude: 30.452639733580966,
     };
 
     navigation.navigate("DefaultScreen", {
