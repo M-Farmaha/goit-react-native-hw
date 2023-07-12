@@ -20,6 +20,7 @@ export default Home = () => {
   const handleBackPress = () => {
     navigation.goBack();
   };
+
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomTabBar {...props} />}

@@ -15,7 +15,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { Camera, CameraType } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
@@ -25,6 +25,7 @@ import DeleteIcon from "../../images/delete-icon.svg";
 import AddPhotoIcon from "../../images/addphoto-icon.svg";
 import LocationIcon from "../../images/location-icon.svg";
 import SyncIcon from "../../images/sync-icon.svg";
+import { Dimensions } from "react-native";
 
 export default CreatePostScreen = ({ navigation }) => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
@@ -141,10 +142,10 @@ export default CreatePostScreen = ({ navigation }) => {
 
   const publishPost = async () => {
     setIsLoading(true);
-    // let location = await Location.getCurrentPositionAsync({});
+    let location = await Location.getCurrentPositionAsync({});
     const coords = {
-      latitude: 50.49328581644981,
-      longitude: 30.452639733580966,
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
     };
 
     navigation.navigate("DefaultScreen", {
@@ -196,10 +197,16 @@ export default CreatePostScreen = ({ navigation }) => {
         >
           <View>
             <View>
-              <View style={styles.cameraWrap}>
+              <View
+                style={{
+                  ...styles.cameraWrap,
+                }}
+              >
                 <Camera
-                  style={styles.camera}
-                  ratio={"1:1"}
+                  style={{
+                    width: Dimensions.get("window").width,
+                    height: Dimensions.get("window").width * (4 / 3),
+                  }}
                   type={type}
                   ref={setCameraRef}
                 >
@@ -214,38 +221,38 @@ export default CreatePostScreen = ({ navigation }) => {
                       />
                     </View>
                   )}
-
-                  {photo ? (
-                    <TouchableOpacity
-                      style={styles.addPhoto}
-                      activeOpacity={0.6}
-                      onPress={deletePicture}
-                      disabled={isLoading}
-                    >
-                      <DeleteIcon fill={"#ffffff"} />
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      style={styles.addPhoto}
-                      activeOpacity={0.6}
-                      onPress={takePicture}
-                      disabled={isLoading}
-                    >
-                      <AddPhotoIcon fill={"#ffffff"} />
-                    </TouchableOpacity>
-                  )}
-
-                  {!photo && (
-                    <TouchableOpacity
-                      style={styles.toggleCameraType}
-                      activeOpacity={0.6}
-                      onPress={toggleCameraType}
-                      disabled={isLoading}
-                    >
-                      <SyncIcon fill={"#ffffff"} />
-                    </TouchableOpacity>
-                  )}
                 </Camera>
+
+                {photo ? (
+                  <TouchableOpacity
+                    style={styles.addPhoto}
+                    activeOpacity={0.6}
+                    onPress={deletePicture}
+                    disabled={isLoading}
+                  >
+                    <DeleteIcon fill={"#ffffff"} />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addPhoto}
+                    activeOpacity={0.6}
+                    onPress={takePicture}
+                    disabled={isLoading}
+                  >
+                    <AddPhotoIcon fill={"#ffffff"} />
+                  </TouchableOpacity>
+                )}
+
+                {!photo && (
+                  <TouchableOpacity
+                    style={styles.toggleCameraType}
+                    activeOpacity={0.6}
+                    onPress={toggleCameraType}
+                    disabled={isLoading}
+                  >
+                    <SyncIcon fill={"#ffffff"} />
+                  </TouchableOpacity>
+                )}
               </View>
 
               <TouchableOpacity
@@ -354,14 +361,10 @@ const styles = StyleSheet.create({
   cameraWrap: {
     marginHorizontal: 16,
     marginTop: 32,
-    height: 240,
     backgroundColor: "#f6f6f6",
     borderRadius: 8,
     overflow: "hidden",
-  },
-
-  camera: {
-    flex: 1,
+    height: 240,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -381,6 +384,7 @@ const styles = StyleSheet.create({
   },
 
   addPhoto: {
+    position: "absolute",
     borderRadius: 100,
     width: 60,
     height: 60,

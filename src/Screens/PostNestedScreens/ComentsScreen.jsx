@@ -7,14 +7,13 @@ import {
   Keyboard,
   Platform,
   Image,
-  TouchableWithoutFeedback,
   KeyboardAvoidingView,
-  ActivityIndicator,
   FlatList,
 } from "react-native";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 import BackIcon from "../../images//back-icon.svg";
+import { dataTransformation } from "../../tools/dataTransformation";
 
 export default СomentsScreen = ({ route }) => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
@@ -23,12 +22,7 @@ export default СomentsScreen = ({ route }) => {
   const [commentInput, setCommentInput] = useState("");
   const [comments, setComments] = useState([
     { id: "photo", photo: route.params.photo },
-    1,
-    2,
-    3,
   ]);
-
-  const flatListRef = useRef(null);
 
   useEffect(() => {
     const showKB = Keyboard.addListener(
@@ -61,7 +55,11 @@ export default СomentsScreen = ({ route }) => {
   }, []);
 
   const addComment = () => {
-    console.log(123);
+    setComments((prev) => [
+      ...prev,
+      { comment: commentInput.trim(), data: dataTransformation(Date.now()) },
+    ]);
+    setCommentInput("");
   };
 
   return (
@@ -72,11 +70,10 @@ export default СomentsScreen = ({ route }) => {
       <View
         style={{
           ...styles.main,
-          paddingBottom: isKeyboardShown ? 104 : 16,
+          paddingBottom: isKeyboardShown && Platform.OS == "ios" ? 104 : 16,
         }}
       >
         <FlatList
-          ref={flatListRef}
           data={comments}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => {
@@ -100,15 +97,9 @@ export default СomentsScreen = ({ route }) => {
                 </View>
 
                 <View style={styles.commentTextWrap}>
-                  <Text style={styles.commentText}>
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Dolorum officiis expedita similique nihil odit veritatis
-                    eum, voluptates in corporis totam.
-                  </Text>
+                  <Text style={styles.commentText}>{item.comment}</Text>
 
-                  <Text style={styles.commentData}>
-                    09 червня, 2020 | 08:40
-                  </Text>
+                  <Text style={styles.commentData}>{item.data}</Text>
                 </View>
               </View>
             );
@@ -132,6 +123,7 @@ export default СomentsScreen = ({ route }) => {
             onChangeText={(value) => setCommentInput(value)}
           />
           <TouchableOpacity
+            disabled={!commentInput.trim()}
             style={styles.addCommentButton}
             activeOpacity={0.6}
             onPress={addComment}
