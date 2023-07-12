@@ -34,6 +34,7 @@ export default CreatePostScreen = ({ navigation }) => {
   const [hasLibraryPermission, setHasLibraryPermission] = useState(null);
   const [hasLocationPermission, setHasLocationPermission] = useState(null);
 
+  const [isCameraActive, setIsCameraActive] = useState(false);
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(CameraType.back);
 
@@ -81,13 +82,19 @@ export default CreatePostScreen = ({ navigation }) => {
       let cameraPermission = await Camera.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraPermission.granted);
 
-      let libraryPermisson = await MediaLibrary.requestPermissionsAsync();
-      setHasLibraryPermission(libraryPermisson.granted);
+      let libraryPermission = await MediaLibrary.requestPermissionsAsync();
+      setHasLibraryPermission(libraryPermission.granted);
 
-      let locatiomPermission =
+      let locationPermission =
         await Location.requestForegroundPermissionsAsync();
-      setHasLocationPermission(locatiomPermission.granted);
+      setHasLocationPermission(locationPermission.granted);
     })();
+
+    setIsCameraActive(true);
+
+    return () => {
+      setIsCameraActive(false);
+    };
   }, []);
 
   const toggleCameraType = () => {
@@ -135,7 +142,7 @@ export default CreatePostScreen = ({ navigation }) => {
   };
 
   const clearPost = () => {
-    deletePicture();
+    setPhoto(null);
     setPostName("");
     setLocationName("");
   };
@@ -202,26 +209,26 @@ export default CreatePostScreen = ({ navigation }) => {
                   ...styles.cameraWrap,
                 }}
               >
-                <Camera
-                  style={{
-                    width: Dimensions.get("window").width,
-                    height: Dimensions.get("window").width * (4 / 3),
-                  }}
-                  type={type}
-                  ref={setCameraRef}
-                >
-                  {photo && (
-                    <View style={styles.photo}>
-                      <Image
-                        source={{ uri: photo }}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                        }}
-                      />
-                    </View>
-                  )}
-                </Camera>
+                {photo ? (
+                  <View style={styles.photo}>
+                    <Image
+                      source={{ uri: photo }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    />
+                  </View>
+                ) : isCameraActive ? (
+                  <Camera
+                    style={{
+                      width: Dimensions.get("window").width,
+                      height: Dimensions.get("window").width * (4 / 3),
+                    }}
+                    type={type}
+                    ref={setCameraRef}
+                  ></Camera>
+                ) : null}
 
                 {photo ? (
                   <TouchableOpacity

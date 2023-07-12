@@ -31,7 +31,6 @@ export default PostsScreen = () => {
             <LogOutButton
               style={{
                 position: "absolute",
-                top: 0,
                 right: 6,
                 padding: 10,
                 backgroundColor: "#99ff7a",

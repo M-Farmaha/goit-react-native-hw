@@ -29,7 +29,6 @@ export default MapScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#9bffe8",
     alignItems: "center",
     justifyContent: "center",
   },
