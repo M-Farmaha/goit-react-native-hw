@@ -121,7 +121,7 @@ export default CreatePostScreen = ({ navigation }) => {
       }
 
       setPhoto(photo.uri);
-      // await MediaLibrary.createAssetAsync(photo.uri);
+      await MediaLibrary.createAssetAsync(photo.uri);
     }
   };
 
