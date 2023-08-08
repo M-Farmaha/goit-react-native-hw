@@ -1,21 +1,11 @@
 import "react-native-gesture-handler";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
-import { useState } from "react";
+import { Provider } from "react-redux";
 import { useFonts } from "expo-font";
 
-import { UserContext } from "./userContext";
-
-import Home from "./src/Screens/MainScreens/Home";
-import AuthScreen from "./src/Screens/AuthScreens/AuthScreen";
-
-const AuthStack = createStackNavigator();
+import { store } from "./src/redux/store";
+import Main from "./src/Components/Main.jsx";
 
 export default App = () => {
-  const [isLogined, setIsLogined] = useState(false);
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./src/fonts/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./src/fonts/Roboto-Medium.ttf"),
@@ -27,29 +17,8 @@ export default App = () => {
   }
 
   return (
-    <UserContext.Provider value={{ isLogined, setIsLogined }}>
-      <View style={styles.container}>
-        <StatusBar style="auto" />
-        <NavigationContainer>
-          {!isLogined ? (
-            <AuthStack.Navigator>
-              <AuthStack.Screen
-                name="Auth"
-                options={{ headerShown: false }}
-                component={AuthScreen}
-              />
-            </AuthStack.Navigator>
-          ) : (
-            <Home setIsLogined={setIsLogined} />
-          )}
-        </NavigationContainer>
-      </View>
-    </UserContext.Provider>
+    <Provider store={store}>
+      <Main />
+    </Provider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

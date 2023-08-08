@@ -4,11 +4,13 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 
-import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { useUser } from "../../../userContext";
+import { useDispatch } from "react-redux";
+
+import { authSingInUser } from "../../redux/auth/authOperations";
 
 export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
   const [isInputEmailFocused, setInputEmailFocused] = useState(false);
@@ -17,12 +19,22 @@ export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { setIsLogined } = useUser();
+  const dispatch = useDispatch();
 
-  const onLogin = () => {
-    setEmail("");
-    setPassword("");
-    setIsLogined(true);
+  const handleLogin = () => {
+    if (email.length === 0) {
+      Alert.alert("Адреса електронної пошти не може бути пустою");
+      return;
+    }
+    if (password.length === 0) {
+      Alert.alert("Пароль не може бути пустим");
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert("Пароль повинен містити щонайменше 6 символів");
+      return;
+    }
+    dispatch(authSingInUser({ email, password }));
   };
 
   return (
@@ -86,7 +98,7 @@ export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
               <TouchableOpacity
                 style={styles.btn}
                 activeOpacity={0.6}
-                onPress={onLogin}
+                onPress={handleLogin}
               >
                 <Text style={styles.btnText}>Увійти</Text>
               </TouchableOpacity>

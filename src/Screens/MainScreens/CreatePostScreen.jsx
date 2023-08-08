@@ -1,5 +1,8 @@
 import * as ImagePicker from "expo-image-picker";
 import { manipulateAsync, FlipType } from "expo-image-manipulator";
+import { Camera, CameraType } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
+import * as Location from "expo-location";
 
 import {
   StyleSheet,
@@ -13,19 +16,18 @@ import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
+import React, { useState, useEffect } from "react";
 
-import React, { useState, useEffect, useRef } from "react";
-
-import { Camera, CameraType } from "expo-camera";
-import * as MediaLibrary from "expo-media-library";
-import * as Location from "expo-location";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
+import { db, storage } from "../../firebase/config.js";
 
 import DeleteIcon from "../../images/delete-icon.svg";
 import AddPhotoIcon from "../../images/addphoto-icon.svg";
 import LocationIcon from "../../images/location-icon.svg";
 import SyncIcon from "../../images/sync-icon.svg";
-import { Dimensions } from "react-native";
 
 export default CreatePostScreen = ({ navigation }) => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
@@ -125,6 +127,19 @@ export default CreatePostScreen = ({ navigation }) => {
     }
   };
 
+  const savePhotoToFirestore = async () => {
+    try {
+      const response = await fetch(photo);
+      const file = await response.blob();
+      const storageRef = ref(storage, `posts/${file._data.blobId}`);
+      await uploadBytes(storageRef, file);
+      const downloadUrl = await getDownloadURL(storageRef);
+      console.log(downloadUrl);
+    } catch (error) {
+      console.error("Error adding document: ", error.message);
+    }
+  };
+
   const deletePicture = () => {
     setPhoto(null);
   };
@@ -149,6 +164,7 @@ export default CreatePostScreen = ({ navigation }) => {
 
   const publishPost = async () => {
     setIsLoading(true);
+
     let location = await Location.getCurrentPositionAsync({});
     const coords = {
       latitude: location.coords.latitude,
@@ -161,6 +177,7 @@ export default CreatePostScreen = ({ navigation }) => {
       photo,
       coords,
     });
+    await savePhotoToFirestore();
     clearPost();
     setIsLoading(false);
   };

@@ -1,14 +1,14 @@
 import { TouchableOpacity } from "react-native";
 
-import { useUser } from "../../userContext";
-
 import LogOutIcon from "../images/log-out-icon.svg";
+import { authSingOutUser } from "../redux/auth/authOperations";
+import { useDispatch } from "react-redux";
 
 export default LogOutButton = ({ style }) => {
-  const { setIsLogined } = useUser();
+  const dispatch = useDispatch();
 
   const handleLogOutPress = () => {
-    setIsLogined(false);
+    dispatch(authSingOutUser());
   };
 
   return (

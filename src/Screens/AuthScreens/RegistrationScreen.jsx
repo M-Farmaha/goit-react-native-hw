@@ -7,7 +7,10 @@ import {
 } from "react-native";
 
 import { useState } from "react";
-import { useUser } from "../../../userContext";
+import { Alert } from "react-native";
+import { useDispatch } from "react-redux";
+
+import { authSingUpUser } from "../../redux/auth/authOperations";
 
 import AddIcon from "../../images/add-icon.svg";
 
@@ -23,14 +26,32 @@ export default RegistrationScreen = ({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { setIsLogined } = useUser();
+  const dispatch = useDispatch();
 
-  const onLogin = () => {
-    setLogin("");
-    setEmail("");
-    setPassword("");
-    setIsLogined(true);
+  const handleRegister = () => {
+    if (login.length === 0) {
+      Alert.alert("Логін не може бути пустим");
+      return;
+    }
+    if (email.length === 0) {
+      Alert.alert("Адреса електронної пошти не може бути пустою");
+      return;
+    }
+    if (password.length === 0) {
+      Alert.alert("Пароль не може бути пустим");
+      return;
+    }
+    if (login.length < 6) {
+      Alert.alert("Логін повинен містити щонайменше 6 символів");
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert("Пароль повинен містити щонайменше 6 символів");
+      return;
+    }
+    dispatch(authSingUpUser({ login, email, password }));
   };
+
   return (
     <>
       <View style={styles.main}>
@@ -113,7 +134,7 @@ export default RegistrationScreen = ({
               <TouchableOpacity
                 style={styles.btn}
                 activeOpacity={0.6}
-                onPress={onLogin}
+                onPress={handleRegister}
               >
                 <Text style={styles.btnText}>Зареєструватися</Text>
               </TouchableOpacity>
