@@ -1,11 +1,14 @@
 import { StyleSheet, Image, View, Text, TouchableOpacity } from "react-native";
+import { useSelector } from "react-redux";
 
 import AddIcon from "../../images/add-icon.svg";
 import BG from "../../images/photo-bg.jpg";
-import ProfilePhoto from "../../images/profile-photo.jpg";
 import LogOutButton from "../../Components/LogOutButton";
+import DefaultProfilePhoto from "../../images/default-profile-photo.jpg";
 
 export default ProfileScreen = () => {
+  const { nickName, photoURL } = useSelector((state) => state.auth);
+
   return (
     <View style={styles.wrap}>
       <Image source={BG} style={styles.bg} />
@@ -13,7 +16,10 @@ export default ProfileScreen = () => {
       <View style={styles.container}>
         <View style={styles.profileImage}>
           <View style={styles.profilePhotoWrap}>
-            <Image source={ProfilePhoto} style={styles.profilePhoto} />
+            <Image
+              source={photoURL ? {uri: photoURL} : DefaultProfilePhoto}
+              style={styles.profilePhoto}
+            />
           </View>
           <TouchableOpacity style={styles.removeBtn} activeOpacity={0.6}>
             <AddIcon width={13} height={13} fill={"#E8E8E8"} />
@@ -26,11 +32,11 @@ export default ProfileScreen = () => {
             top: 12,
             right: 6,
             padding: 10,
-            backgroundColor: "#99ff7a",
+            backgroundColor: "transparent",
           }}
         />
 
-        <Text style={styles.title}>Max Farmaha</Text>
+        <Text style={styles.title}>{nickName}</Text>
       </View>
     </View>
   );

@@ -10,7 +10,6 @@ export default LogOutButton = ({ style }) => {
   const handleLogOutPress = () => {
     dispatch(authSingOutUser());
   };
-
   return (
     <TouchableOpacity
       style={style}

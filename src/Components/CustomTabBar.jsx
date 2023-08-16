@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   inactiveIcon: {
     width: 70,
     height: 40,
-    backgroundColor: "#99ff7a",
+    backgroundColor: "transparent",
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",

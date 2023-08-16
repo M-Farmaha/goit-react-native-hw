@@ -83,7 +83,7 @@ export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
                 right: 6,
                 top: 4,
                 padding: 10,
-                backgroundColor: "#99ff7a",
+                backgroundColor: "transparent",
               }}
               activeOpacity={0.6}
               onPress={() => setShowPassword((prevState) => !prevState)}

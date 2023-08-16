@@ -7,40 +7,73 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
 import CommentIcon from "../../images/comment-icon.svg";
 import LocationIcon from "../../images/location-icon.svg";
-import ProfilePhoto from "../../images/profile-photo.jpg";
+import DefaultProfilePhoto from "../../images/default-profile-photo.jpg";
 
-export default DefaultScreen = ({ route, navigation }) => {
+export default DefaultScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
 
+  const { nickName, email, photoURL } = useSelector((state) => state.auth);
+
   useEffect(() => {
-    if (route.params) {
-      setPosts((prev) => [...prev, route.params]);
-    }
-  }, [route.params]);
+    onSnapshot(collection(db, "posts"), (snapshot) => {
+      const allPosts = snapshot.docs.map((post) => {
+        const commentsRef = collection(db, "posts", post.id, "comments");
+
+        onSnapshot(commentsRef, (snapshot) => {
+          const updatedSize = snapshot.size;
+
+          setPosts((prev) => {
+            return prev.map((item) => {
+              if (item.id === post.id) {
+                return { ...item, size: updatedSize };
+              }
+              return item;
+            });
+          });
+        });
+
+        return {
+          id: post.id,
+          data: post.data(),
+          size: 0,
+        };
+      });
+
+      setPosts(allPosts);
+    });
+  }, []);
 
   return (
     <View style={styles.main}>
       <View style={styles.profile}>
         <View style={styles.profileImage}>
-          <Image source={ProfilePhoto} style={styles.profilePhoto} />
+          <Image source={photoURL ? {uri: photoURL} : DefaultProfilePhoto} style={styles.profilePhoto} />
         </View>
         <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>Maks Farmaha</Text>
-          <Text style={styles.profileEmail}>maks.farmaha@gmail.com</Text>
+          <Text style={styles.profileName}>{nickName}</Text>
+          <Text style={styles.profileEmail}>{email}</Text>
         </View>
       </View>
+
       <FlatList
         data={posts}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <>
             <View style={styles.postImageWrap}>
-              <Image source={{ uri: item.photo }} style={styles.postImage} />
+              <Image
+                source={{ uri: item.data.photo }}
+                style={styles.postImage}
+              />
             </View>
-            <Text style={styles.postName}>{item.postName}</Text>
+            <Text style={styles.postName}>{item.data.postName}</Text>
 
             <View style={styles.postOptionsWrap}>
               <TouchableOpacity
@@ -48,26 +81,33 @@ export default DefaultScreen = ({ route, navigation }) => {
                 activeOpacity={0.6}
                 onPress={() => {
                   navigation.navigate("CommentsScreen", {
-                    photo: item.photo,
+                    postId: item.id,
+                    postPhoto: item.data.photo,
                   });
                 }}
               >
-                <CommentIcon stroke={"#BDBDBD"} strokeWidth={"1px"} />
-                <Text style={styles.commentAmount}>0</Text>
+                <CommentIcon
+                  stroke={item.size ? "#FF6C00" : "#BDBDBD"}
+                  strokeWidth={"1px"}
+                  fill={item.size ? "#FF6C00" : "transparent"}
+                />
+                <Text style={styles.commentAmount}>{item.size}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.locationButton}
                 activeOpacity={0.6}
                 onPress={() => {
                   navigation.navigate("MapScreen", {
-                    postName: item.postName,
-                    locationName: item.locationName,
-                    coords: item.coords,
+                    postName: item.data.postName,
+                    locationName: item.data.locationName,
+                    coords: item.data.coords,
                   });
                 }}
               >
                 <LocationIcon fill={"#bdbdbd"} />
-                <Text style={styles.locationText}>{item.locationName}</Text>
+                <Text style={styles.locationText}>
+                  {item.data.locationName}
+                </Text>
               </TouchableOpacity>
             </View>
           </>
@@ -140,7 +180,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#99ff7a",
+    backgroundColor: "transparent",
     padding: 10,
   },
 
@@ -155,7 +195,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#99ff7a",
+    backgroundColor: "transparent",
     padding: 10,
   },
 

@@ -8,7 +8,8 @@ import {
   signOut,
 } from "firebase/auth";
 
-import { auth } from "../../firebase/config.js";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { auth, storage } from "../../firebase/config.js";
 
 import {
   updateUserProfile,
@@ -16,16 +17,47 @@ import {
   authSignOut,
 } from "./authReducer.js";
 
+const saveProfilePhotoToFirebaseStorage = async (profilePhoto, userId) => {
+  try {
+    if (!profilePhoto) {
+      return null;
+    }
+    const response = await fetch(profilePhoto);
+    const file = await response.blob();
+    const storageRef = ref(storage, `profilePhotos/${userId}`);
+    await uploadBytes(storageRef, file);
+    const downloadUrl = await getDownloadURL(storageRef);
+    return downloadUrl;
+  } catch {
+    Alert.alert("Помилка збереження фото профілю до сховища бази даних");
+  }
+};
+
 export const authSingUpUser =
-  ({ login, email, password }) =>
+  ({ login, email, password, profilePhoto }) =>
   async (dispatch, getState) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+
       const user = auth.currentUser;
       if (user) {
-        await updateProfile(user, { displayName: login });
+        const downloadUrl = await saveProfilePhotoToFirebaseStorage(
+          profilePhoto,
+          user.uid
+        );
+
+        await updateProfile(user, {
+          displayName: login,
+          photoURL: downloadUrl,
+        });
+
         dispatch(
-          updateUserProfile({ userId: user.uid, nickName: user.displayName })
+          updateUserProfile({
+            userId: user.uid,
+            nickName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+          })
         );
       }
     } catch (error) {
@@ -38,7 +70,7 @@ export const authSingUpUser =
       } else if (error.code === "auth/email-already-in-use") {
         Alert.alert("Така пошта вже зареєстрована");
       } else {
-        Alert.alert(error.code);
+        Alert.alert("Помилка реєстрації");
       }
     }
   };
@@ -57,7 +89,7 @@ export const authSingInUser =
       } else if (error.code === "auth/missing-password") {
         Alert.alert("Пароль не може бути пустим");
       } else {
-        Alert.alert(error.code);
+        Alert.alert("Помилка авторизації");
       }
     }
   };
@@ -66,8 +98,8 @@ export const authSingOutUser = () => async (dispatch, getState) => {
   try {
     await signOut(auth);
     dispatch(authSignOut());
-  } catch (error) {
-    Alert.alert(error.message);
+  } catch {
+    Alert.alert("Помилка виходу");
   }
 };
 
@@ -79,6 +111,8 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
         updateUserProfile({
           userId: user.uid,
           nickName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
         })
       );
     }

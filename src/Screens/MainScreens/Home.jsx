@@ -52,7 +52,7 @@ export default Home = () => {
               style={{
                 marginLeft: 6,
                 padding: 10,
-                backgroundColor: "#99ff7a",
+                backgroundColor: "transparent",
               }}
               activeOpacity={0.6}
               onPress={handleBackPress}

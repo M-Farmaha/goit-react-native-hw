@@ -1,8 +1,10 @@
-import * as ImagePicker from "expo-image-picker";
 import { manipulateAsync, FlipType } from "expo-image-manipulator";
 import { Camera, CameraType } from "expo-camera";
-import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
+import * as MediaLibrary from "expo-media-library";
+import * as ImagePicker from "expo-image-picker";
+
+import axios from "axios";
 
 import {
   StyleSheet,
@@ -17,8 +19,10 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
   Dimensions,
+  Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
@@ -42,9 +46,12 @@ export default CreatePostScreen = ({ navigation }) => {
 
   const [postName, setPostName] = useState("");
   const [locationName, setLocationName] = useState("");
+  const [coords, setCoords] = useState(null);
   const [photo, setPhoto] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const { nickName, userId } = useSelector((state) => state.auth);
 
   const disabledPostBtn = !photo || !postName || !locationName || isLoading;
   const disabledDeleteBtn = (!photo && !postName && !locationName) || isLoading;
@@ -105,11 +112,39 @@ export default CreatePostScreen = ({ navigation }) => {
     );
   };
 
+  const getPlaceInfoByCoordinates = async () => {
+    try {
+      const location = await Location.getCurrentPositionAsync();
+
+      const { latitude, longitude } = location.coords;
+
+      setCoords({
+        latitude,
+        longitude,
+      });
+
+      const apiUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
+
+      const response = await axios.get(apiUrl);
+      const { address } = response.data;
+
+      if (address.city && address.country) {
+        setLocationName(`${address.city}, ${address.country}`);
+      } else {
+        Alert.alert("Location not found.");
+      }
+    } catch (error) {
+      Alert.alert(`Error getting location information: ${error.message}`);
+    }
+  };
+
   const takePicture = async () => {
     const options = {
       quality: 1,
       base64: true,
     };
+
+    getPlaceInfoByCoordinates();
 
     if (cameraRef) {
       let photo = await cameraRef.takePictureAsync(options);
@@ -123,20 +158,31 @@ export default CreatePostScreen = ({ navigation }) => {
       }
 
       setPhoto(photo.uri);
+
       await MediaLibrary.createAssetAsync(photo.uri);
     }
   };
 
-  const savePhotoToFirestore = async () => {
+  const savePhotoToFirebaseStorage = async () => {
     try {
       const response = await fetch(photo);
       const file = await response.blob();
-      const storageRef = ref(storage, `posts/${file._data.blobId}`);
+      const storageRef = ref(storage, `postsPhotos/${file._data.blobId}`);
       await uploadBytes(storageRef, file);
       const downloadUrl = await getDownloadURL(storageRef);
-      console.log(downloadUrl);
+      return downloadUrl;
     } catch (error) {
-      console.error("Error adding document: ", error.message);
+      Alert.alert(
+        `Помилка збереження фото до сховища бази даних, ${error.message}`
+      );
+    }
+  };
+
+  const writeDataToFirestore = async (data) => {
+    try {
+      await addDoc(collection(db, "posts"), data);
+    } catch (error) {
+      Alert.alert(`Помилка запису до бази даних, ${error.message}`);
     }
   };
 
@@ -165,42 +211,71 @@ export default CreatePostScreen = ({ navigation }) => {
   const publishPost = async () => {
     setIsLoading(true);
 
-    let location = await Location.getCurrentPositionAsync({});
-    const coords = {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-    };
+    try {
+      const downloadUrl = await savePhotoToFirebaseStorage();
 
-    navigation.navigate("DefaultScreen", {
-      postName,
-      locationName,
-      photo,
-      coords,
-    });
-    await savePhotoToFirestore();
-    clearPost();
+      await writeDataToFirestore({
+        coords,
+        postName,
+        locationName,
+        photo: downloadUrl,
+        nickName,
+        userId,
+      });
+
+      navigation.navigate("DefaultScreen");
+
+      clearPost();
+    } catch (error) {
+      Alert.alert(`Помилка публікації посту, ${error.message}`);
+    }
+
     setIsLoading(false);
   };
 
   if (hasCameraPermission === null) {
-    return <Text>Requesting camera permition...</Text>;
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Requesting camera permition...</Text>
+      </View>
+    );
   }
   if (hasCameraPermission === false) {
-    return <Text>Permition for camera not granted</Text>;
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Permition for camera not granted</Text>
+      </View>
+    );
   }
 
   if (hasLibraryPermission === null) {
-    return <Text>Requesting library permition...</Text>;
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Requesting library permition...</Text>
+      </View>
+    );
   }
   if (hasLibraryPermission === false) {
-    return <Text>Permition for library not granted</Text>;
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Permition for library not granted</Text>
+      </View>
+    );
   }
 
   if (hasLocationPermission === null) {
-    return <Text>Requesting location permition...</Text>;
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Requesting location permition...</Text>
+      </View>
+    );
   }
   if (hasLocationPermission === false) {
-    return <Text>Permission to access location not granted</Text>;
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Permission to access location not granted</Text>
+      </View>
+    );
   }
 
   return (
@@ -398,7 +473,7 @@ const styles = StyleSheet.create({
     bottom: 6,
     right: 6,
     padding: 10,
-    backgroundColor: "#99ff7a",
+    backgroundColor: "transparent",
   },
 
   photo: {
@@ -463,7 +538,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     marginRight: "auto",
     marginBottom: 22,
-    backgroundColor: "#99ff7a",
+    backgroundColor: "transparent",
     padding: 10,
   },
 

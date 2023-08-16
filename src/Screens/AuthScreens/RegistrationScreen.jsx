@@ -4,13 +4,16 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Alert,
+  Image,
 } from "react-native";
+import { useState, useEffect } from "react";
 
-import { useState } from "react";
-import { Alert } from "react-native";
 import { useDispatch } from "react-redux";
-
 import { authSingUpUser } from "../../redux/auth/authOperations";
+
+import * as MediaLibrary from "expo-media-library";
+import * as ImagePicker from "expo-image-picker";
 
 import AddIcon from "../../images/add-icon.svg";
 
@@ -18,6 +21,7 @@ export default RegistrationScreen = ({
   isKeyboardShown,
   setIsRegisttationScreen,
 }) => {
+  const [hasLibraryPermission, setHasLibraryPermission] = useState(null);
   const [isInputLoginFocused, setInputLoginFocused] = useState(false);
   const [isInputEmailFocused, setInputEmailFocused] = useState(false);
   const [isInputPasswordFocused, setInputPasswordFocused] = useState(false);
@@ -25,8 +29,37 @@ export default RegistrationScreen = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState(null);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    (async () => {
+      let libraryPermission = await MediaLibrary.requestPermissionsAsync();
+      setHasLibraryPermission(libraryPermission.granted);
+    })();
+  }, []);
+
+  const pickProfilePhoto = async () => {
+    if (hasLibraryPermission === null) {
+      Alert.alert("Requesting library permition...");
+      return;
+    }
+    if (hasLibraryPermission === false) {
+      Alert.alert("Permition for library not granted");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfilePhoto(result.assets[0].uri);
+    }
+  };
 
   const handleRegister = () => {
     if (login.length === 0) {
@@ -49,14 +82,24 @@ export default RegistrationScreen = ({
       Alert.alert("Пароль повинен містити щонайменше 6 символів");
       return;
     }
-    dispatch(authSingUpUser({ login, email, password }));
+    dispatch(authSingUpUser({ login, email, password, profilePhoto }));
   };
 
   return (
     <>
       <View style={styles.main}>
         <View style={styles.profileImage}>
-          <TouchableOpacity style={styles.addButton} activeOpacity={0.6}>
+          <View style={styles.profilePhotoWrap}>
+            <Image
+              source={{uri: profilePhoto}}
+              style={styles.profilePhoto}
+            />
+          </View>
+          <TouchableOpacity
+            onPress={pickProfilePhoto}
+            style={styles.addButton}
+            activeOpacity={0.6}
+          >
             <AddIcon width={13} height={13} fill={"#FF6C00"} />
           </TouchableOpacity>
         </View>
@@ -119,7 +162,7 @@ export default RegistrationScreen = ({
                 right: 6,
                 top: 4,
                 padding: 10,
-                backgroundColor: "#99ff7a",
+                backgroundColor: "transparent",
               }}
               activeOpacity={0.6}
               onPress={() => setShowPassword((prevState) => !prevState)}
@@ -188,16 +231,25 @@ const styles = StyleSheet.create({
     marginTop: 92,
     marginBottom: 32,
   },
+
   profileImage: {
     position: "absolute",
+    marginTop: -60, // Зсув контейнера вліво на половину його ширини
+    top: 0,
+    alignSelf: "center",
+  },
+
+  profilePhotoWrap: {
     width: 120,
     height: 120,
     borderRadius: 16,
     backgroundColor: "#F6F6F6",
-    zIndex: 2,
-    marginTop: -60, // Зсув контейнера вліво на половину його ширини
-    top: 0,
-    alignSelf: "center",
+    overflow: "hidden",
+  },
+
+  profilePhoto: {
+    width: 120,
+    height: 120,
   },
 
   addButton: {

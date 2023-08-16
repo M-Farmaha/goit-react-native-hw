@@ -9,20 +9,59 @@ import {
   Image,
   KeyboardAvoidingView,
   FlatList,
+  Alert,
+  SafeAreaView,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 
+import { collection, addDoc, doc, onSnapshot } from "firebase/firestore";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { db } from "../../firebase/config.js";
+
+import DefaultProfilePhoto from "../../images/default-profile-photo.jpg";
 import BackIcon from "../../images//back-icon.svg";
 import { dataTransformation } from "../../tools/dataTransformation";
 
 export default СomentsScreen = ({ route }) => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
-
   const [isInputCommentFocused, setInputCommentFocused] = useState(false);
   const [commentInput, setCommentInput] = useState("");
-  const [comments, setComments] = useState([
-    { id: "photo", photo: route.params.photo },
-  ]);
+
+  const { postId, postPhoto } = route.params;
+  const [comments, setComments] = useState([{ id: "photo", postPhoto }]);
+
+  const flatListRef = useRef(null);
+  const { userId } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    onSnapshot(
+      collection(db, "posts", postId, "comments"),
+      async (snapshot) => {
+        const allComments = await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const storage = getStorage();
+            const photoRef = ref(storage, `profilePhotos/${doc.data().userId}`);
+
+            let photoURL = null;
+            try {
+              photoURL = await getDownloadURL(photoRef);
+            } catch (error) {}
+
+            return {
+              id: doc.id,
+              data: doc.data(),
+              photoURL,
+            };
+          })
+        );
+
+        setComments([{ id: "photo", postPhoto }, ...allComments]);
+
+        flatListRef.current.scrollToEnd();
+      }
+    );
+  }, []);
 
   useEffect(() => {
     const showKB = Keyboard.addListener(
@@ -54,11 +93,27 @@ export default СomentsScreen = ({ route }) => {
     };
   }, []);
 
-  const addComment = () => {
-    setComments((prev) => [
-      ...prev,
-      { comment: commentInput.trim(), data: dataTransformation(Date.now()) },
-    ]);
+  const writeCommentToFirestore = async (id, data) => {
+    try {
+      const postDocRef = doc(db, "posts", id);
+
+      const commentsCollectionRef = collection(postDocRef, "comments");
+
+      await addDoc(commentsCollectionRef, data);
+    } catch (error) {
+      Alert.alert(`Помилка запису до бази даних, ${error.message}`);
+    }
+  };
+
+  const addComment = async () => {
+    const comment = {
+      comment: commentInput.trim(),
+      date: Date.now(),
+      userId,
+    };
+
+    await writeCommentToFirestore(postId, comment);
+
     setCommentInput("");
   };
 
@@ -74,14 +129,15 @@ export default СomentsScreen = ({ route }) => {
         }}
       >
         <FlatList
+          ref={flatListRef}
           data={comments}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             if (item.id === "photo") {
               return (
                 <View style={styles.postImageWrap}>
                   <Image
-                    source={{ uri: item.photo }}
+                    source={{ uri: item.postPhoto }}
                     style={{
                       width: "100%",
                       height: "100%",
@@ -91,15 +147,45 @@ export default СomentsScreen = ({ route }) => {
               );
             }
             return (
-              <View style={styles.commentWrap}>
+              <View
+                style={{
+                  ...styles.commentWrap,
+                  flexDirection:
+                    item.data.userId === userId ? "row-reverse" : "row",
+                }}
+              >
                 <View style={styles.commentProfileWrap}>
-                  <Text>M</Text>
+                  <Image
+                    source={
+                      item.photoURL
+                        ? { uri: item.photoURL }
+                        : DefaultProfilePhoto
+                    }
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
                 </View>
 
-                <View style={styles.commentTextWrap}>
-                  <Text style={styles.commentText}>{item.comment}</Text>
+                <View
+                  style={{
+                    ...styles.commentTextWrap,
+                    borderTopLeftRadius: item.data.userId === userId ? 6 : 0,
+                    borderTopRightRadius: item.data.userId === userId ? 0 : 6,
+                  }}
+                >
+                  <Text style={styles.commentText}>{item.data.comment}</Text>
 
-                  <Text style={styles.commentData}>{item.data}</Text>
+                  <Text
+                    style={{
+                      ...styles.commentDate,
+                      alignSelf:
+                        item.data.userId === userId ? "flex-start" : "flex-end",
+                    }}
+                  >
+                    {dataTransformation(item.data.date)}
+                  </Text>
                 </View>
               </View>
             );
@@ -151,7 +237,7 @@ const styles = StyleSheet.create({
   postImageWrap: {
     marginHorizontal: 16,
     marginTop: 32,
-    marginBottom: 32,
+    marginBottom: 8,
     height: 240,
     backgroundColor: "#f6f6f6",
     borderRadius: 8,
@@ -190,9 +276,9 @@ const styles = StyleSheet.create({
 
   commentWrap: {
     display: "flex",
-    flexDirection: "row",
+
     gap: 16,
-    marginBottom: 24,
+    marginTop: 24,
     marginHorizontal: 16,
   },
 
@@ -210,10 +296,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 1,
     flexDirection: "column",
-    alignItems: "flex-start",
+    alignSelf: "flex-start",
     gap: 8,
     borderRadius: 6,
-    borderTopLeftRadius: 0,
     backgroundColor: "rgba(0, 0, 0, 0.03)",
     padding: 16,
   },
@@ -224,7 +309,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
-  commentData: {
+  commentDate: {
     color: "#BDBDBD",
     fontSize: 10,
   },

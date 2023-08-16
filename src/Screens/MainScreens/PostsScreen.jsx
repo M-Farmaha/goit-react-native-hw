@@ -33,7 +33,7 @@ export default PostsScreen = () => {
                 position: "absolute",
                 right: 6,
                 padding: 10,
-                backgroundColor: "#99ff7a",
+                backgroundColor: "transparent",
               }}
             />
           ),
@@ -52,7 +52,7 @@ export default PostsScreen = () => {
               style={{
                 marginLeft: 6,
                 padding: 10,
-                backgroundColor: "#99ff7a",
+                backgroundColor: "transparent",
               }}
               activeOpacity={0.6}
               onPress={handleBackPress}
@@ -75,7 +75,7 @@ export default PostsScreen = () => {
               style={{
                 marginLeft: 6,
                 padding: 10,
-                backgroundColor: "#99ff7a",
+                backgroundColor: "transparent",
               }}
               activeOpacity={0.6}
               onPress={handleBackPress}
