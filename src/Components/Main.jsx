@@ -1,9 +1,9 @@
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import { auth } from "../firebase/config.js";
+
 import Home from "../Screens/MainScreens/Home";
 import AuthScreen from "../Screens/AuthScreens/AuthScreen";
 import { useDispatch, useSelector } from "react-redux";

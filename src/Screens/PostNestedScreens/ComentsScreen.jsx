@@ -10,12 +10,20 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Alert,
-  SafeAreaView,
 } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 
-import { collection, addDoc, doc, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  updateDoc,
+  increment,
+} from "firebase/firestore";
 import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import { db } from "../../firebase/config.js";
 
@@ -32,35 +40,36 @@ export default СomentsScreen = ({ route }) => {
   const [comments, setComments] = useState([{ id: "photo", postPhoto }]);
 
   const flatListRef = useRef(null);
+
   const { userId } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    onSnapshot(
-      collection(db, "posts", postId, "comments"),
-      async (snapshot) => {
-        const allComments = await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const storage = getStorage();
-            const photoRef = ref(storage, `profilePhotos/${doc.data().userId}`);
+    const commentsRef = collection(db, "posts", postId, "comments");
+    const orderedCommentsRef = query(commentsRef, orderBy("date", "asc"));
 
-            let photoURL = null;
-            try {
-              photoURL = await getDownloadURL(photoRef);
-            } catch (error) {}
+    onSnapshot(orderedCommentsRef, async (snapshot) => {
+      const allComments = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const storage = getStorage();
+          const photoRef = ref(storage, `profilePhotos/${doc.data().userId}`);
 
-            return {
-              id: doc.id,
-              data: doc.data(),
-              photoURL,
-            };
-          })
-        );
+          let photoURL = null;
+          try {
+            photoURL = await getDownloadURL(photoRef);
+          } catch (error) {}
 
-        setComments([{ id: "photo", postPhoto }, ...allComments]);
+          return {
+            id: doc.id,
+            data: doc.data(),
+            photoURL,
+          };
+        })
+      );
 
-        flatListRef.current.scrollToEnd();
-      }
-    );
+      setComments([{ id: "photo", postPhoto }, ...allComments]);
+
+      flatListRef?.current?.scrollToEnd()
+    });
   }, []);
 
   useEffect(() => {
@@ -100,6 +109,10 @@ export default СomentsScreen = ({ route }) => {
       const commentsCollectionRef = collection(postDocRef, "comments");
 
       await addDoc(commentsCollectionRef, data);
+
+      await updateDoc(postDocRef, {
+        commentsCount: increment(1),
+      });
     } catch (error) {
       Alert.alert(`Помилка запису до бази даних, ${error.message}`);
     }

@@ -32,8 +32,9 @@ import DeleteIcon from "../../images/delete-icon.svg";
 import AddPhotoIcon from "../../images/addphoto-icon.svg";
 import LocationIcon from "../../images/location-icon.svg";
 import SyncIcon from "../../images/sync-icon.svg";
+import { useNavigation } from "@react-navigation/native";
 
-export default CreatePostScreen = ({ navigation }) => {
+export default CreatePostScreen = () => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
 
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
@@ -50,6 +51,8 @@ export default CreatePostScreen = ({ navigation }) => {
   const [photo, setPhoto] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigation = useNavigation();
 
   const { nickName, userId } = useSelector((state) => state.auth);
 
@@ -118,18 +121,21 @@ export default CreatePostScreen = ({ navigation }) => {
 
       const { latitude, longitude } = location.coords;
 
-      setCoords({
-        latitude,
-        longitude,
-      });
-
       const apiUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
 
       const response = await axios.get(apiUrl);
       const { address } = response.data;
 
+      setCoords({
+        latitude: location ? latitude : null,
+        longitude: location ? longitude : null,
+        city: address ? address.city : null,
+        country: address ? address.country : null,
+      });
+
       if (address.city && address.country) {
         setLocationName(`${address.city}, ${address.country}`);
+
       } else {
         Alert.alert("Location not found.");
       }
@@ -144,8 +150,6 @@ export default CreatePostScreen = ({ navigation }) => {
       base64: true,
     };
 
-    getPlaceInfoByCoordinates();
-
     if (cameraRef) {
       let photo = await cameraRef.takePictureAsync(options);
 
@@ -158,6 +162,8 @@ export default CreatePostScreen = ({ navigation }) => {
       }
 
       setPhoto(photo.uri);
+
+      await getPlaceInfoByCoordinates();
 
       await MediaLibrary.createAssetAsync(photo.uri);
     }
@@ -221,9 +227,13 @@ export default CreatePostScreen = ({ navigation }) => {
         photo: downloadUrl,
         nickName,
         userId,
+        date: Date.now(),
+        likesCount: 0,
+        likedBy: [],
+        commentsCount: 0
       });
 
-      navigation.navigate("DefaultScreen");
+      navigation.goBack();
 
       clearPost();
     } catch (error) {

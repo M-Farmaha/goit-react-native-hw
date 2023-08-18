@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import { useFonts } from "expo-font";
 
 import { store } from "./src/redux/store";
+import { DataProvider } from "./src/tools/DataContext";
 import Main from "./src/Components/Main.jsx";
 
 export default App = () => {
@@ -18,7 +19,9 @@ export default App = () => {
 
   return (
     <Provider store={store}>
-      <Main />
+      <DataProvider>
+        <Main />
+      </DataProvider>
     </Provider>
   );
 };

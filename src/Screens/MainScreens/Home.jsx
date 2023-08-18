@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
+
 import PostsScreen from "./PostsScreen";
 import CreatePostScreen from "./CreatePostScreen";
 import ProfileScreen from "./ProfileScreen";
@@ -18,7 +19,7 @@ export default Home = () => {
   const navigation = useNavigation();
 
   const handleBackPress = () => {
-    navigation.goBack();
+    navigation.goBack()
   };
 
   return (
