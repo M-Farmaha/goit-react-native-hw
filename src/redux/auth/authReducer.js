@@ -6,6 +6,7 @@ const initialState = {
   email: null,
   photoURL: null,
   stateChange: false,
+  isLoading: false,
 };
 
 export const authSlice = createSlice({
@@ -23,9 +24,17 @@ export const authSlice = createSlice({
       ...state,
       stateChange: payload,
     }),
-    authSignOut: () => ({ state: initialState }),
+    isLoadingChange: (state, { payload }) => ({
+      ...state,
+      isLoading: payload,
+    }),
+    authSignOut: () => ({ ...initialState }),
   },
 });
 
-export const { updateUserProfile, authStateChange, authSignOut } =
-  authSlice.actions;
+export const {
+  updateUserProfile,
+  authStateChange,
+  authSignOut,
+  isLoadingChange,
+} = authSlice.actions;

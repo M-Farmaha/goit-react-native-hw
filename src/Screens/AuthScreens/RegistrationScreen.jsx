@@ -6,14 +6,16 @@ import {
   TouchableOpacity,
   Alert,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
 
-import { useDispatch } from "react-redux";
-import { authSingUpUser } from "../../redux/auth/authOperations";
-
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
+
+import { useDispatch, useSelector } from "react-redux";
+import { authSingUpUser } from "../../redux/auth/authOperations";
+import { getIsLoading } from "../../redux/auth/selectors";
 
 import AddIcon from "../../images/add-icon.svg";
 
@@ -32,6 +34,9 @@ export default RegistrationScreen = ({
   const [profilePhoto, setProfilePhoto] = useState(null);
 
   const dispatch = useDispatch();
+
+  const isLoading = useSelector(getIsLoading);
+  const disabledRegisterBtn = isLoading;
 
   useEffect(() => {
     (async () => {
@@ -59,6 +64,10 @@ export default RegistrationScreen = ({
     if (!result.canceled) {
       setProfilePhoto(result.assets[0].uri);
     }
+  };
+
+  const deleteProfilePhoto = () => {
+    setProfilePhoto(null);
   };
 
   const handleRegister = () => {
@@ -90,17 +99,22 @@ export default RegistrationScreen = ({
       <View style={styles.main}>
         <View style={styles.profileImage}>
           <View style={styles.profilePhotoWrap}>
-            <Image
-              source={{uri: profilePhoto}}
-              style={styles.profilePhoto}
-            />
+            <Image source={{ uri: profilePhoto }} style={styles.profilePhoto} />
           </View>
           <TouchableOpacity
-            onPress={pickProfilePhoto}
-            style={styles.addButton}
+            onPress={profilePhoto ? deleteProfilePhoto : pickProfilePhoto}
+            style={{
+              ...styles.addButton,
+              borderColor: profilePhoto ? "#E8E8E8" : "#FF6C00",
+              transform: [{ rotate: profilePhoto ? "45deg" : "0deg" }],
+            }}
             activeOpacity={0.6}
           >
-            <AddIcon width={13} height={13} fill={"#FF6C00"} />
+            <AddIcon
+              width={13}
+              height={13}
+              fill={profilePhoto ? "#BDBDBD" : "#FF6C00"}
+            />
           </TouchableOpacity>
         </View>
         <Text style={styles.title}>Реєстрація</Text>
@@ -175,11 +189,26 @@ export default RegistrationScreen = ({
           {!isKeyboardShown && (
             <View>
               <TouchableOpacity
-                style={styles.btn}
+                disabled={disabledRegisterBtn}
                 activeOpacity={0.6}
+                style={{
+                  ...styles.btn,
+                  backgroundColor: disabledRegisterBtn ? "#f6f6f6" : "#FF6C00",
+                }}
                 onPress={handleRegister}
               >
-                <Text style={styles.btnText}>Зареєструватися</Text>
+                {isLoading ? (
+                  <ActivityIndicator size={"large"} />
+                ) : (
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: disabledRegisterBtn ? "#bdbdbd" : "#ffffff",
+                    }}
+                  >
+                    Зареєструватися
+                  </Text>
+                )}
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.btnLink}
@@ -234,7 +263,7 @@ const styles = StyleSheet.create({
 
   profileImage: {
     position: "absolute",
-    marginTop: -60, // Зсув контейнера вліво на половину його ширини
+    marginTop: -60,
     top: 0,
     alignSelf: "center",
   },
@@ -261,7 +290,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 50,
     borderWidth: 1,
-    borderColor: "#FF6C00",
+
     justifyContent: "center",
     alignItems: "center",
   },
@@ -275,10 +304,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  btnText: {
-    color: "#ffffff",
-    fontSize: 16,
-  },
   btnLink: {
     marginLeft: "auto",
     marginRight: "auto",

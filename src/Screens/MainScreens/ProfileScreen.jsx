@@ -5,9 +5,13 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import * as MediaLibrary from "expo-media-library";
+import * as ImagePicker from "expo-image-picker";
 
 import {
   collection,
@@ -21,7 +25,12 @@ import {
   arrayRemove,
   arrayUnion,
 } from "firebase/firestore";
-import { db } from "../../firebase/config";
+import { ref, getStorage, deleteObject } from "firebase/storage";
+import { auth, db } from "../../firebase/config";
+import { updateProfile } from "firebase/auth";
+
+import { saveProfilePhotoToFirebaseStorage } from "../../redux/auth/authOperations";
+import { updateUserProfile } from "../../redux/auth/authReducer";
 
 import BG from "../../images/photo-bg.jpg";
 import LogOutButton from "../../Components/LogOutButton";
@@ -29,14 +38,16 @@ import AddIcon from "../../images/add-icon.svg";
 import CommentIcon from "../../images/comment-icon.svg";
 import LikeIcon from "../../images/like-icon.svg";
 import LocationIcon from "../../images/location-icon.svg";
-import DefaultProfilePhoto from "../../images/default-profile-photo.jpg";
 
 export default ProfileScreen = ({ navigation }) => {
+  const [hasLibraryPermission, setHasLibraryPermission] = useState(null);
   const [posts, setPosts] = useState([]);
 
-  const { nickName, photoURL, userId } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   const flatListRef = useRef(null);
+
+  const { nickName, photoURL, userId } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const postsRef = collection(db, "posts");
@@ -62,6 +73,13 @@ export default ProfileScreen = ({ navigation }) => {
     }
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      let libraryPermission = await MediaLibrary.requestPermissionsAsync();
+      setHasLibraryPermission(libraryPermission.granted);
+    })();
+  }, []);
+
   const handleLike = async (post) => {
     const postRef = doc(db, "posts", post.id);
 
@@ -78,6 +96,78 @@ export default ProfileScreen = ({ navigation }) => {
     }
   };
 
+  const deleteProfilePhoto = async () => {
+    try {
+      const storage = getStorage();
+      const storageRef = ref(storage, `profilePhotos/${userId}`);
+
+      await deleteObject(storageRef);
+
+      const user = auth.currentUser;
+
+      if (user) {
+        await updateProfile(user, {
+          photoURL: "",
+        });
+
+        dispatch(
+          updateUserProfile({
+            userId: user.uid,
+            nickName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+          })
+        );
+      }
+    } catch (error) {
+      Alert.alert("Помилка видалення фото профілю");
+    }
+  };
+
+  const addProfilePhoto = async () => {
+    try {
+      if (hasLibraryPermission === null) {
+        Alert.alert("Requesting library permition...");
+        return;
+      }
+      if (hasLibraryPermission === false) {
+        Alert.alert("Permition for library not granted");
+        return;
+      }
+
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const profilePhoto = result.assets[0].uri;
+        const user = auth.currentUser;
+
+        if (user) {
+          const downloadUrl = await saveProfilePhotoToFirebaseStorage(
+            profilePhoto,
+            user.uid
+          );
+
+          await updateProfile(user, { photoURL: downloadUrl });
+
+          dispatch(
+            updateUserProfile({
+              userId: user.uid,
+              nickName: user.displayName,
+              email: user.email,
+              photoURL: user.photoURL,
+            })
+          );
+        }
+      }
+    } catch (error) {
+      Alert.alert("Помилка додавання фото профілю");
+    }
+  };
+
   return (
     <View style={styles.wrap}>
       <Image source={BG} style={styles.bg} />
@@ -85,13 +175,22 @@ export default ProfileScreen = ({ navigation }) => {
       <View style={styles.container}>
         <View style={styles.profileImage}>
           <View style={styles.profilePhotoWrap}>
-            <Image
-              source={photoURL ? { uri: photoURL } : DefaultProfilePhoto}
-              style={styles.profilePhoto}
-            />
+            <Image source={{ uri: photoURL }} style={styles.profilePhoto} />
           </View>
-          <TouchableOpacity style={styles.removeBtn} activeOpacity={0.6}>
-            <AddIcon width={13} height={13} fill={"#E8E8E8"} />
+          <TouchableOpacity
+            style={{
+              ...styles.addButton,
+              borderColor: photoURL ? "#E8E8E8" : "#FF6C00",
+              transform: [{ rotate: photoURL ? "45deg" : "0deg" }],
+            }}
+            activeOpacity={0.6}
+            onPress={photoURL ? deleteProfilePhoto : addProfilePhoto}
+          >
+            <AddIcon
+              width={13}
+              height={13}
+              fill={photoURL ? "#BDBDBD" : "#FF6C00"}
+            />
           </TouchableOpacity>
         </View>
 
@@ -128,7 +227,11 @@ export default ProfileScreen = ({ navigation }) => {
                       strokeWidth={"1px"}
                       fill={item.data.commentsCount ? "#FF6C00" : "transparent"}
                     />
-                    <Text style={styles.commentAmount}>
+                    <Text
+                      style={{
+                        color: item.data.commentsCount ? "#212121" : "#BDBDBD",
+                      }}
+                    >
                       {item.data.commentsCount}
                     </Text>
                   </TouchableOpacity>
@@ -141,9 +244,17 @@ export default ProfileScreen = ({ navigation }) => {
                     <LikeIcon
                       stroke={item.data.likesCount ? "#FF6C00" : "#BDBDBD"}
                       strokeWidth={"1px"}
-                      fill={"transparent"}
+                      fill={
+                        item.data.likedBy.includes(userId)
+                          ? "#FF6C00"
+                          : "transparent"
+                      }
                     />
-                    <Text style={styles.commentAmount}>
+                    <Text
+                      style={{
+                        color: item.data.likesCount ? "#212121" : "#BDBDBD",
+                      }}
+                    >
                       {item.data.likesCount}
                     </Text>
                   </TouchableOpacity>
@@ -263,16 +374,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 
-  commentAmount: {
-    fontSize: 16,
-    fontWeight: 400,
-    color: "#BDBDBD",
-  },
-
   locationButton: {
     flexDirection: "row",
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: 6,
     backgroundColor: "transparent",
     padding: 10,
@@ -280,7 +385,7 @@ const styles = StyleSheet.create({
   },
 
   locationText: {
-    textAlign: 'right',
+    textAlign: "right",
     fontSize: 16,
     fontWeight: 400,
     color: "#212121",
@@ -297,8 +402,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 
-  removeBtn: {
-    transform: [{ rotate: "45deg" }],
+  addButton: {
     position: "absolute",
     right: -12,
     bottom: 14,
@@ -307,7 +411,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 50,
     borderWidth: 1,
-    borderColor: "#E8E8E8",
+
     justifyContent: "center",
     alignItems: "center",
   },

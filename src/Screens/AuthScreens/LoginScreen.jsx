@@ -5,12 +5,14 @@ import {
   Text,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { authSingInUser } from "../../redux/auth/authOperations";
+import { getIsLoading } from "../../redux/auth/selectors";
 
 export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
   const [isInputEmailFocused, setInputEmailFocused] = useState(false);
@@ -20,6 +22,9 @@ export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const dispatch = useDispatch();
+  
+  const isLoading = useSelector(getIsLoading);
+  const disabledLoginBtn = isLoading;
 
   const handleLogin = () => {
     if (email.length === 0) {
@@ -34,6 +39,7 @@ export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
       Alert.alert("Пароль повинен містити щонайменше 6 символів");
       return;
     }
+
     dispatch(authSingInUser({ email, password }));
   };
 
@@ -96,11 +102,26 @@ export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
           {!isKeyboardShown && (
             <View>
               <TouchableOpacity
-                style={styles.btn}
+                disabled={disabledLoginBtn}
                 activeOpacity={0.6}
+                style={{
+                  ...styles.btn,
+                  backgroundColor: disabledLoginBtn ? "#f6f6f6" : "#FF6C00",
+                }}
                 onPress={handleLogin}
               >
-                <Text style={styles.btnText}>Увійти</Text>
+                {isLoading ? (
+                  <ActivityIndicator size={"large"} />
+                ) : (
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: disabledLoginBtn ? "#bdbdbd" : "#ffffff",
+                    }}
+                  >
+                    Увійти
+                  </Text>
+                )}
               </TouchableOpacity>
               <View style={styles.btnLinkWrap}>
                 <Text style={styles.btnLinkText}>Немає акаунту? </Text>
@@ -172,10 +193,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  btnText: {
-    color: "#ffffff",
-    fontSize: 16,
-  },
 
   btnLinkText: {
     color: "#1B4371",

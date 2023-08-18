@@ -25,7 +25,6 @@ import { db } from "../../firebase/config";
 import CommentIcon from "../../images/comment-icon.svg";
 import LikeIcon from "../../images/like-icon.svg";
 import LocationIcon from "../../images/location-icon.svg";
-import DefaultProfilePhoto from "../../images/default-profile-photo.jpg";
 
 export default DefaultScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
@@ -76,10 +75,7 @@ export default DefaultScreen = ({ navigation }) => {
     <View style={styles.main}>
       <View style={styles.profile}>
         <View style={styles.profileImage}>
-          <Image
-            source={photoURL ? { uri: photoURL } : DefaultProfilePhoto}
-            style={styles.profilePhoto}
-          />
+          <Image source={{ uri: photoURL }} style={styles.profilePhoto} />
         </View>
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>{nickName}</Text>
@@ -118,7 +114,11 @@ export default DefaultScreen = ({ navigation }) => {
                     strokeWidth={"1px"}
                     fill={item.data.commentsCount ? "#FF6C00" : "transparent"}
                   />
-                  <Text style={styles.commentAmount}>
+                  <Text
+                    style={{
+                      color: item.data.commentsCount ? "#212121" : "#BDBDBD",
+                    }}
+                  >
                     {item.data.commentsCount}
                   </Text>
                 </TouchableOpacity>
@@ -131,9 +131,17 @@ export default DefaultScreen = ({ navigation }) => {
                   <LikeIcon
                     stroke={item.data.likesCount ? "#FF6C00" : "#BDBDBD"}
                     strokeWidth={"1px"}
-                    fill={"transparent"}
+                    fill={
+                      item.data.likedBy.includes(userId)
+                        ? "#FF6C00"
+                        : "transparent"
+                    }
                   />
-                  <Text style={styles.commentAmount}>
+                  <Text
+                    style={{
+                      color: item.data.likesCount ? "#212121" : "#BDBDBD",
+                    }}
+                  >
                     {item.data.likesCount}
                   </Text>
                 </TouchableOpacity>
@@ -230,16 +238,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 
-  commentAmount: {
-    fontSize: 16,
-    fontWeight: 400,
-    color: "#BDBDBD",
-  },
-
   locationButton: {
     flexDirection: "row",
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: 6,
     backgroundColor: "transparent",
     padding: 10,
@@ -247,7 +249,7 @@ const styles = StyleSheet.create({
   },
 
   locationText: {
-    textAlign: 'right',
+    textAlign: "right",
     fontSize: 16,
     fontWeight: 400,
     color: "#212121",

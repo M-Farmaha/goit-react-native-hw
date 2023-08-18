@@ -135,12 +135,11 @@ export default CreatePostScreen = () => {
 
       if (address.city && address.country) {
         setLocationName(`${address.city}, ${address.country}`);
-
       } else {
-        Alert.alert("Location not found.");
+        Alert.alert("Локація не визначена");
       }
-    } catch (error) {
-      Alert.alert(`Error getting location information: ${error.message}`);
+    } catch {
+      Alert.alert(`Помилка визначення локації`);
     }
   };
 
@@ -177,18 +176,16 @@ export default CreatePostScreen = () => {
       await uploadBytes(storageRef, file);
       const downloadUrl = await getDownloadURL(storageRef);
       return downloadUrl;
-    } catch (error) {
-      Alert.alert(
-        `Помилка збереження фото до сховища бази даних, ${error.message}`
-      );
+    } catch {
+      Alert.alert(`Помилка збереження фото до сховища бази даних`);
     }
   };
 
   const writeDataToFirestore = async (data) => {
     try {
       await addDoc(collection(db, "posts"), data);
-    } catch (error) {
-      Alert.alert(`Помилка запису до бази даних, ${error.message}`);
+    } catch {
+      Alert.alert(`Помилка запису до бази даних`);
     }
   };
 
@@ -230,14 +227,14 @@ export default CreatePostScreen = () => {
         date: Date.now(),
         likesCount: 0,
         likedBy: [],
-        commentsCount: 0
+        commentsCount: 0,
       });
 
       navigation.goBack();
 
       clearPost();
-    } catch (error) {
-      Alert.alert(`Помилка публікації посту, ${error.message}`);
+    } catch {
+      Alert.alert(`Помилка публікації посту`);
     }
 
     setIsLoading(false);
@@ -421,7 +418,7 @@ export default CreatePostScreen = () => {
                   ) : (
                     <Text
                       style={{
-                        ...styles.btnText,
+                        fontSize: 16,
                         color: disabledPostBtn ? "#bdbdbd" : "#ffffff",
                       }}
                     >
@@ -527,10 +524,6 @@ const styles = StyleSheet.create({
     marginTop: 32,
     justifyContent: "center",
     alignItems: "center",
-  },
-
-  btnText: {
-    fontSize: 16,
   },
 
   deleteBtn: {

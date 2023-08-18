@@ -15,9 +15,10 @@ import {
   updateUserProfile,
   authStateChange,
   authSignOut,
+  isLoadingChange,
 } from "./authReducer.js";
 
-const saveProfilePhotoToFirebaseStorage = async (profilePhoto, userId) => {
+export const saveProfilePhotoToFirebaseStorage = async (profilePhoto, userId) => {
   try {
     if (!profilePhoto) {
       return null;
@@ -36,6 +37,8 @@ const saveProfilePhotoToFirebaseStorage = async (profilePhoto, userId) => {
 export const authSingUpUser =
   ({ login, email, password, profilePhoto }) =>
   async (dispatch, getState) => {
+    dispatch(isLoadingChange(true));
+
     try {
       await createUserWithEmailAndPassword(auth, email, password);
 
@@ -73,11 +76,16 @@ export const authSingUpUser =
         Alert.alert("Помилка реєстрації");
       }
     }
+
+    dispatch(isLoadingChange(false));
   };
 
 export const authSingInUser =
   ({ email, password }) =>
   async (dispatch, getState) => {
+
+    dispatch(isLoadingChange(true));
+
     try {
       const user = await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
@@ -92,6 +100,8 @@ export const authSingInUser =
         Alert.alert("Помилка авторизації");
       }
     }
+
+    dispatch(isLoadingChange(false));
   };
 
 export const authSingOutUser = () => async (dispatch, getState) => {
