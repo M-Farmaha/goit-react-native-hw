@@ -181,7 +181,6 @@ export default ProfileScreen = ({ navigation }) => {
       }
     } catch (error) {
       Alert.alert("Помилка додавання фото профілю");
-      console.log(error);
     }
   };
 
