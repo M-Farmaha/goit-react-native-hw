@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 
 import { useDispatch, useSelector } from "react-redux";
 import { authSingUpUser } from "../../redux/auth/authOperations";
@@ -62,7 +63,11 @@ export default RegistrationScreen = ({
     });
 
     if (!result.canceled) {
-      setProfilePhoto(result.assets[0].uri);
+      const { uri } = await ImageManipulator.manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: 360, height: 360 } }]
+      );
+      setProfilePhoto(uri);
     }
   };
 
@@ -99,7 +104,7 @@ export default RegistrationScreen = ({
       <View style={styles.main}>
         <View style={styles.profileImage}>
           <View style={styles.profilePhotoWrap}>
-            <Image source={{ uri: profilePhoto }} style={styles.profilePhoto} />
+            {profilePhoto && <Image source={{ uri: profilePhoto }} style={styles.profilePhoto} />}
           </View>
           <TouchableOpacity
             onPress={profilePhoto ? deleteProfilePhoto : pickProfilePhoto}

@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 
 import {
   collection,
@@ -25,11 +26,16 @@ import {
   arrayRemove,
   arrayUnion,
 } from "firebase/firestore";
-import { ref, getStorage, deleteObject } from "firebase/storage";
+import {
+  ref,
+  getStorage,
+  deleteObject,
+  getDownloadURL,
+  uploadBytes,
+} from "firebase/storage";
 import { auth, db } from "../../firebase/config";
 import { updateProfile } from "firebase/auth";
 
-import { saveProfilePhotoToFirebaseStorage } from "../../redux/auth/authOperations";
 import { updateUserProfile } from "../../redux/auth/authReducer";
 
 import BG from "../../images/photo-bg.jpg";
@@ -142,14 +148,24 @@ export default ProfileScreen = ({ navigation }) => {
       });
 
       if (!result.canceled) {
-        const profilePhoto = result.assets[0].uri;
+        const { uri } = await ImageManipulator.manipulateAsync(
+          result.assets[0].uri,
+          [{ resize: { width: 360, height: 360 } }]
+        );
+
         const user = auth.currentUser;
 
         if (user) {
-          const downloadUrl = await saveProfilePhotoToFirebaseStorage(
-            profilePhoto,
-            user.uid
-          );
+          const photo = await fetch(uri);
+          const file = await photo.blob();
+
+          const storage = getStorage();
+
+          const storageRef = ref(storage, `profilePhotos/${user.uid}`);
+
+          await uploadBytes(storageRef, file);
+
+          const downloadUrl = await getDownloadURL(storageRef);
 
           await updateProfile(user, { photoURL: downloadUrl });
 
@@ -165,6 +181,7 @@ export default ProfileScreen = ({ navigation }) => {
       }
     } catch (error) {
       Alert.alert("Помилка додавання фото профілю");
+      console.log(error);
     }
   };
 
@@ -175,7 +192,9 @@ export default ProfileScreen = ({ navigation }) => {
       <View style={styles.container}>
         <View style={styles.profileImage}>
           <View style={styles.profilePhotoWrap}>
-            <Image source={{ uri: photoURL }} style={styles.profilePhoto} />
+            {photoURL && (
+              <Image source={{ uri: photoURL }} style={styles.profilePhoto} />
+            )}
           </View>
           <TouchableOpacity
             style={{
@@ -273,7 +292,7 @@ export default ProfileScreen = ({ navigation }) => {
                 >
                   <LocationIcon fill={"#bdbdbd"} />
                   <Text style={styles.locationText}>
-                    {item.data.coords.country}
+                    {item.data.coords?.country || item.data.locationName}
                   </Text>
                 </TouchableOpacity>
               </View>

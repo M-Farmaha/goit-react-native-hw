@@ -75,7 +75,7 @@ export default DefaultScreen = ({ navigation }) => {
     <View style={styles.main}>
       <View style={styles.profile}>
         <View style={styles.profileImage}>
-          <Image source={{ uri: photoURL }} style={styles.profilePhoto} />
+          {photoURL && <Image source={{ uri: photoURL }} style={styles.profilePhoto} />}
         </View>
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>{nickName}</Text>

@@ -1,8 +1,8 @@
-import { manipulateAsync, FlipType } from "expo-image-manipulator";
 import { Camera, CameraType } from "expo-camera";
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 
 import axios from "axios";
 
@@ -144,6 +144,7 @@ export default CreatePostScreen = () => {
   };
 
   const takePicture = async () => {
+  
     const options = {
       quality: 1,
       base64: true,
@@ -153,18 +154,23 @@ export default CreatePostScreen = () => {
       let photo = await cameraRef.takePictureAsync(options);
 
       if (type === CameraType.front) {
-        photo = await manipulateAsync(
+        photo = await ImageManipulator.manipulateAsync(
           photo.localUri || photo.uri,
-          [{ flip: FlipType.Horizontal }],
-          { compress: 1 }
+          [{ flip: ImageManipulator.FlipType.Horizontal }]
         );
       }
 
-      setPhoto(photo.uri);
+      const { uri } = await ImageManipulator.manipulateAsync(
+        photo.uri,
+        [{ resize: { width: 720 } }],
+        { compress: 1 }
+      );
+
+      setPhoto(uri);
 
       await getPlaceInfoByCoordinates();
 
-      await MediaLibrary.createAssetAsync(photo.uri);
+      // await MediaLibrary.createAssetAsync(photo.uri);
     }
   };
 
@@ -200,8 +206,14 @@ export default CreatePostScreen = () => {
       quality: 1,
     });
 
+    const { uri } = await ImageManipulator.manipulateAsync(
+      result.assets[0].uri,
+      [{ resize: { width: 720 } }],
+      { compress: 1 }
+    );
+
     if (!result.canceled) {
-      setPhoto(result.assets[0].uri);
+      setPhoto(uri);
     }
   };
 
