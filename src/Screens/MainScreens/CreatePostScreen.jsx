@@ -175,16 +175,12 @@ export default CreatePostScreen = () => {
   };
 
   const savePhotoToFirebaseStorage = async () => {
-    try {
-      const response = await fetch(photo);
-      const file = await response.blob();
-      const storageRef = ref(storage, `postsPhotos/${file._data.blobId}`);
-      await uploadBytes(storageRef, file);
-      const downloadUrl = await getDownloadURL(storageRef);
-      return downloadUrl;
-    } catch {
-      Alert.alert(`Помилка збереження фото до сховища бази даних`);
-    }
+    const response = await fetch(photo);
+    const file = await response.blob();
+    const storageRef = ref(storage, `postsPhotos/${file._data.blobId}`);
+    await uploadBytes(storageRef, file);
+    const downloadUrl = await getDownloadURL(storageRef);
+    return downloadUrl;
   };
 
   const writeDataToFirestore = async (data) => {

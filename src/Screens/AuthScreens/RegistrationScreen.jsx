@@ -22,7 +22,7 @@ import AddIcon from "../../images/add-icon.svg";
 
 export default RegistrationScreen = ({
   isKeyboardShown,
-  setIsRegisttationScreen,
+  setisRegistrationScreen,
 }) => {
   const [hasLibraryPermission, setHasLibraryPermission] = useState(null);
   const [isInputLoginFocused, setInputLoginFocused] = useState(false);
@@ -218,7 +218,7 @@ export default RegistrationScreen = ({
               <TouchableOpacity
                 style={styles.btnLink}
                 activeOpacity={0.6}
-                onPress={() => setIsRegisttationScreen(false)}
+                onPress={() => setisRegistrationScreen(false)}
               >
                 <Text style={styles.btnLinkText}>Вже є акаунт? Увійти</Text>
               </TouchableOpacity>

@@ -15,7 +15,7 @@ import LoginScreen from "./LoginScreen";
 
 export default AuthScreen = () => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
-  const [isRegisttationScreen, setIsRegisttationScreen] = useState(false);
+  const [isRegistrationScreen, setisRegistrationScreen] = useState(false);
 
   useEffect(() => {
     const showKB = Keyboard.addListener(
@@ -59,15 +59,15 @@ export default AuthScreen = () => {
           behavior={Platform.OS == "ios" ? "padding" : null}
           style={styles.container}
         >
-          {isRegisttationScreen ? (
+          {isRegistrationScreen ? (
             <RegistrationScreen
               isKeyboardShown={isKeyboardShown}
-              setIsRegisttationScreen={setIsRegisttationScreen}
+              setisRegistrationScreen={setisRegistrationScreen}
             />
           ) : (
             <LoginScreen
               isKeyboardShown={isKeyboardShown}
-              setIsRegisttationScreen={setIsRegisttationScreen}
+              setisRegistrationScreen={setisRegistrationScreen}
             />
           )}
         </KeyboardAvoidingView>

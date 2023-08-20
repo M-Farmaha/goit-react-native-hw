@@ -5,6 +5,7 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
@@ -50,7 +51,7 @@ export default DefaultScreen = ({ navigation }) => {
       setPosts(allPosts);
     });
 
-    if (posts.length > 0) {
+    if (posts.length > 1) {
       flatListRef?.current?.scrollToIndex({ index: 0 });
     }
   }, []);
@@ -75,7 +76,9 @@ export default DefaultScreen = ({ navigation }) => {
     <View style={styles.main}>
       <View style={styles.profile}>
         <View style={styles.profileImage}>
-          {photoURL && <Image source={{ uri: photoURL }} style={styles.profilePhoto} />}
+          {photoURL && (
+            <Image source={{ uri: photoURL }} style={styles.profilePhoto} />
+          )}
         </View>
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>{nickName}</Text>
@@ -151,11 +154,17 @@ export default DefaultScreen = ({ navigation }) => {
                 style={styles.locationButton}
                 activeOpacity={0.6}
                 onPress={() => {
-                  navigation.navigate("MapScreen", {
-                    postName: item.data.postName,
-                    locationName: item.data.locationName,
-                    coords: item.data.coords,
-                  });
+                  if (!item.data.coords) {
+                    Alert.alert(
+                      "Неможливо відобразити локацію для даного посту"
+                    );
+                  } else {
+                    navigation.navigate("MapScreen", {
+                      postName: item.data.postName,
+                      locationName: item.data.locationName,
+                      coords: item.data.coords,
+                    });
+                  }
                 }}
               >
                 <LocationIcon fill={"#bdbdbd"} />

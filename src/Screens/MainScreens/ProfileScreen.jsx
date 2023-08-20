@@ -74,7 +74,7 @@ export default ProfileScreen = ({ navigation }) => {
       setPosts(allPosts);
     });
 
-    if (posts.length > 0) {
+    if (posts.length > 1) {
       flatListRef?.current?.scrollToIndex({ index: 0 });
     }
   }, []);
@@ -282,11 +282,17 @@ export default ProfileScreen = ({ navigation }) => {
                   style={styles.locationButton}
                   activeOpacity={0.6}
                   onPress={() => {
-                    navigation.navigate("MapScreen", {
-                      postName: item.data.postName,
-                      locationName: item.data.locationName,
-                      coords: item.data.coords,
-                    });
+                    if (!item.data.coords) {
+                      Alert.alert(
+                        "Неможливо відобразити локацію для даного посту"
+                      );
+                    } else {
+                      navigation.navigate("MapScreen", {
+                        postName: item.data.postName,
+                        locationName: item.data.locationName,
+                        coords: item.data.coords,
+                      });
+                    }
                   }}
                 >
                   <LocationIcon fill={"#bdbdbd"} />

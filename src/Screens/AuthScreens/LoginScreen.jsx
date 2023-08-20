@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { authSingInUser } from "../../redux/auth/authOperations";
 import { getIsLoading } from "../../redux/auth/selectors";
 
-export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
+export default LoginScreen = ({ isKeyboardShown, setisRegistrationScreen }) => {
   const [isInputEmailFocused, setInputEmailFocused] = useState(false);
   const [isInputPasswordFocused, setInputPasswordFocused] = useState(false);
   const [email, setEmail] = useState("");
@@ -128,7 +128,7 @@ export default LoginScreen = ({ isKeyboardShown, setIsRegisttationScreen }) => {
                 <TouchableOpacity
                   style={styles.btnLink}
                   activeOpacity={0.6}
-                  onPress={() => setIsRegisttationScreen(true)}
+                  onPress={() => setisRegistrationScreen(true)}
                 >
                   <Text
                     style={{
