@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   activeIcon: {
     width: 70,
     height: 40,
-    backgroundColor: "#FF6C00",
+    backgroundColor: "#3470FF",
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
@@ -58,8 +58,8 @@ const styles = StyleSheet.create({
   inactiveIcon: {
     width: 70,
     height: 40,
-    backgroundColor: "transparent",
     borderRadius: 100,
+    backgroundColor: "#eef3ff",
     justifyContent: "center",
     alignItems: "center",
   },

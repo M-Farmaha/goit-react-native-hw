@@ -59,17 +59,19 @@ export default AuthScreen = () => {
           behavior={Platform.OS == "ios" ? "padding" : null}
           style={styles.container}
         >
-          {isRegistrationScreen ? (
-            <RegistrationScreen
-              isKeyboardShown={isKeyboardShown}
-              setisRegistrationScreen={setisRegistrationScreen}
-            />
-          ) : (
-            <LoginScreen
-              isKeyboardShown={isKeyboardShown}
-              setisRegistrationScreen={setisRegistrationScreen}
-            />
-          )}
+
+            {isRegistrationScreen ? (
+              <RegistrationScreen
+                isKeyboardShown={isKeyboardShown}
+                setisRegistrationScreen={setisRegistrationScreen}
+              />
+            ) : (
+              <LoginScreen
+                isKeyboardShown={isKeyboardShown}
+                setisRegistrationScreen={setisRegistrationScreen}
+              />
+            )}
+
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </>

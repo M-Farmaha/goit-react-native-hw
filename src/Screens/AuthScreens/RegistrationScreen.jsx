@@ -110,7 +110,7 @@ export default RegistrationScreen = ({
             onPress={profilePhoto ? deleteProfilePhoto : pickProfilePhoto}
             style={{
               ...styles.addButton,
-              borderColor: profilePhoto ? "#E8E8E8" : "#FF6C00",
+              borderColor: profilePhoto ? "#E8E8E8" : "#3470FF",
               transform: [{ rotate: profilePhoto ? "45deg" : "0deg" }],
             }}
             activeOpacity={0.6}
@@ -118,7 +118,7 @@ export default RegistrationScreen = ({
             <AddIcon
               width={13}
               height={13}
-              fill={profilePhoto ? "#BDBDBD" : "#FF6C00"}
+              fill={profilePhoto ? "#BDBDBD" : "#3470FF"}
             />
           </TouchableOpacity>
         </View>
@@ -129,12 +129,12 @@ export default RegistrationScreen = ({
               ...styles.input,
               marginBottom: 16,
               backgroundColor: isInputLoginFocused ? "#ffffff" : "#F6F6F6",
-              borderColor: isInputLoginFocused ? "#FF6C00" : "#E8E8E8",
+              borderColor: isInputLoginFocused ? "#3470FF" : "#E8E8E8",
             }}
             placeholder={"Логін"}
             autoComplete={"off"}
             autoCorrect={false}
-            selectionColor={"#FF6C00"}
+            selectionColor={"#3470FF"}
             value={login}
             onFocus={() => setInputLoginFocused(true)}
             onBlur={() => setInputLoginFocused(false)}
@@ -145,12 +145,12 @@ export default RegistrationScreen = ({
               ...styles.input,
               marginBottom: 16,
               backgroundColor: isInputEmailFocused ? "#ffffff" : "#F6F6F6",
-              borderColor: isInputEmailFocused ? "#FF6C00" : "#E8E8E8",
+              borderColor: isInputEmailFocused ? "#3470FF" : "#E8E8E8",
             }}
             placeholder={"Адреса електронної пошти"}
             autoComplete={"off"}
             autoCorrect={false}
-            selectionColor={"#FF6C00"}
+            selectionColor={"#3470FF"}
             value={email}
             onFocus={() => setInputEmailFocused(true)}
             onBlur={() => setInputEmailFocused(false)}
@@ -162,13 +162,13 @@ export default RegistrationScreen = ({
                 ...styles.input,
                 marginBottom: 34,
                 backgroundColor: isInputPasswordFocused ? "#ffffff" : "#F6F6F6",
-                borderColor: isInputPasswordFocused ? "#FF6C00" : "#E8E8E8",
+                borderColor: isInputPasswordFocused ? "#3470FF" : "#E8E8E8",
               }}
               placeholder={"Пароль"}
               secureTextEntry={!showPassword}
               autoComplete={"off"}
               autoCorrect={false}
-              selectionColor={"#FF6C00"}
+              selectionColor={"#3470FF"}
               value={password}
               onFocus={() => setInputPasswordFocused(true)}
               onBlur={() => setInputPasswordFocused(false)}
@@ -198,7 +198,7 @@ export default RegistrationScreen = ({
                 activeOpacity={0.6}
                 style={{
                   ...styles.btn,
-                  backgroundColor: disabledRegisterBtn ? "#f6f6f6" : "#FF6C00",
+                  backgroundColor: disabledRegisterBtn ? "#f6f6f6" : "#3470FF",
                 }}
                 onPress={handleRegister}
               >
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   },
 
   btn: {
-    backgroundColor: "#FF6C00",
+    backgroundColor: "#3470FF",
     borderRadius: 100,
     height: 50,
     marginBottom: 16,

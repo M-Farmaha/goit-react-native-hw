@@ -53,12 +53,12 @@ export default LoginScreen = ({ isKeyboardShown, setisRegistrationScreen }) => {
               ...styles.input,
               marginBottom: 16,
               backgroundColor: isInputEmailFocused ? "#ffffff" : "#F6F6F6",
-              borderColor: isInputEmailFocused ? "#FF6C00" : "#E8E8E8",
+              borderColor: isInputEmailFocused ? "#3470FF" : "#E8E8E8",
             }}
             placeholder={"Адреса електронної пошти"}
             autoComplete={"off"}
             autoCorrect={false}
-            selectionColor={"#FF6C00"}
+            selectionColor={"#3470FF"}
             value={email}
             onFocus={() => setInputEmailFocused(true)}
             onBlur={() => setInputEmailFocused(false)}
@@ -70,13 +70,13 @@ export default LoginScreen = ({ isKeyboardShown, setisRegistrationScreen }) => {
                 ...styles.input,
                 marginBottom: 34,
                 backgroundColor: isInputPasswordFocused ? "#ffffff" : "#F6F6F6",
-                borderColor: isInputPasswordFocused ? "#FF6C00" : "#E8E8E8",
+                borderColor: isInputPasswordFocused ? "#3470FF" : "#E8E8E8",
               }}
               placeholder={"Пароль"}
               secureTextEntry={!showPassword}
               autoComplete={"off"}
               autoCorrect={false}
-              selectionColor={"#FF6C00"}
+              selectionColor={"#3470FF"}
               value={password}
               onFocus={() => setInputPasswordFocused(true)}
               onBlur={() => setInputPasswordFocused(false)}
@@ -106,7 +106,7 @@ export default LoginScreen = ({ isKeyboardShown, setisRegistrationScreen }) => {
                 activeOpacity={0.6}
                 style={{
                   ...styles.btn,
-                  backgroundColor: disabledLoginBtn ? "#f6f6f6" : "#FF6C00",
+                  backgroundColor: disabledLoginBtn ? "#f6f6f6" : "#3470FF",
                 }}
                 onPress={handleLogin}
               >
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
 
   btn: {
-    backgroundColor: "#FF6C00",
+    backgroundColor: "#3470FF",
     borderRadius: 100,
     height: 50,
     marginBottom: 16,

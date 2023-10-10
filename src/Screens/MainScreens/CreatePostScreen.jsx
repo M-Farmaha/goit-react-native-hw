@@ -417,7 +417,7 @@ export default CreatePostScreen = () => {
                   activeOpacity={0.6}
                   style={{
                     ...styles.postBtn,
-                    backgroundColor: disabledPostBtn ? "#f6f6f6" : "#FF6C00",
+                    backgroundColor: disabledPostBtn ? "#f6f6f6" : "#3470FF",
                   }}
                   onPress={publishPost}
                 >
@@ -444,7 +444,7 @@ export default CreatePostScreen = () => {
               activeOpacity={0.6}
               style={{
                 ...styles.deleteBtn,
-                backgroundColor: disabledDeleteBtn ? "#f6f6f6" : "#FF6C00",
+                backgroundColor: disabledDeleteBtn ? "#f6f6f6" : "#3470FF",
               }}
               onPress={clearPost}
             >

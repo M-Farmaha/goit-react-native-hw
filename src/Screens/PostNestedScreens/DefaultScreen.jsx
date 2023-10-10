@@ -113,9 +113,9 @@ export default DefaultScreen = ({ navigation }) => {
                   }}
                 >
                   <CommentIcon
-                    stroke={item.data.commentsCount ? "#FF6C00" : "#BDBDBD"}
+                    stroke={item.data.commentsCount ? "#3470FF" : "#BDBDBD"}
                     strokeWidth={"1px"}
-                    fill={item.data.commentsCount ? "#FF6C00" : "transparent"}
+                    fill={item.data.commentsCount ? "#3470FF" : "transparent"}
                   />
                   <Text
                     style={{
@@ -132,11 +132,11 @@ export default DefaultScreen = ({ navigation }) => {
                   onPress={() => handleLike(item)}
                 >
                   <LikeIcon
-                    stroke={item.data.likesCount ? "#FF6C00" : "#BDBDBD"}
+                    stroke={item.data.likesCount ? "#3470FF" : "#BDBDBD"}
                     strokeWidth={"1px"}
                     fill={
                       item.data.likedBy.includes(userId)
-                        ? "#FF6C00"
+                        ? "#3470FF"
                         : "transparent"
                     }
                   />

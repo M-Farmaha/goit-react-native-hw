@@ -198,7 +198,7 @@ export default ProfileScreen = ({ navigation }) => {
           <TouchableOpacity
             style={{
               ...styles.addButton,
-              borderColor: photoURL ? "#E8E8E8" : "#FF6C00",
+              borderColor: photoURL ? "#E8E8E8" : "#3470FF",
               transform: [{ rotate: photoURL ? "45deg" : "0deg" }],
             }}
             activeOpacity={0.6}
@@ -207,7 +207,7 @@ export default ProfileScreen = ({ navigation }) => {
             <AddIcon
               width={13}
               height={13}
-              fill={photoURL ? "#BDBDBD" : "#FF6C00"}
+              fill={photoURL ? "#BDBDBD" : "#3470FF"}
             />
           </TouchableOpacity>
         </View>
@@ -241,9 +241,9 @@ export default ProfileScreen = ({ navigation }) => {
                     }}
                   >
                     <CommentIcon
-                      stroke={item.data.commentsCount ? "#FF6C00" : "#BDBDBD"}
+                      stroke={item.data.commentsCount ? "#3470FF" : "#BDBDBD"}
                       strokeWidth={"1px"}
-                      fill={item.data.commentsCount ? "#FF6C00" : "transparent"}
+                      fill={item.data.commentsCount ? "#3470FF" : "transparent"}
                     />
                     <Text
                       style={{
@@ -260,11 +260,11 @@ export default ProfileScreen = ({ navigation }) => {
                     onPress={() => handleLike(item)}
                   >
                     <LikeIcon
-                      stroke={item.data.likesCount ? "#FF6C00" : "#BDBDBD"}
+                      stroke={item.data.likesCount ? "#3470FF" : "#BDBDBD"}
                       strokeWidth={"1px"}
                       fill={
                         item.data.likedBy.includes(userId)
-                          ? "#FF6C00"
+                          ? "#3470FF"
                           : "transparent"
                       }
                     />
